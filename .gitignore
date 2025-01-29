@@ -1,0 +1,39 @@
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment variables (sensitive data)
+.env
+
+# IDE/editor files
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Nix-related
+.idx/
+result/ 
+.nix-profile/ 
+
+# Optional: If you use TypeScript
+*.tsbuildinfo
