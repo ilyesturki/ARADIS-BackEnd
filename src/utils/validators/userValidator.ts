@@ -7,6 +7,7 @@ import {
 } from "../../middlewares/sanitizer";
 import User from "../../models/User";
 import bcrypt from "bcrypt";
+import { RequestHandler } from "express";
 // LOGED USER ONLY
 export const updateLoggedUserValidator = [
   paramsSanitizer("id"),
@@ -126,7 +127,7 @@ export const deleteLoggedUserValidator = [
   // })
   validatorMiddleware,
 ];
-export const getLoggedUserValidator = [
+export const getLoggedUserValidator: RequestHandler[] = [
   paramsSanitizer("id"),
   param("id").isMongoId().withMessage("Invalid User id format"),
   validatorMiddleware,

@@ -36,22 +36,7 @@ router.use(protect);
 // router.use("/me/:id", extractUserId);
 router
   .route("/me")
-  /**
-   * @route   GET /me/:id
-   * @desc    Get the logged-in user
-   * @access  Private
-   */
-  .get(
-    extractUserId,
-    (req, res, next) => {
-      console.log("req.params");
-      console.log(req.params);
-      console.log("req.params");
-      next();
-    },
-    getLoggedUserValidator,
-    getUser
-  )
+  .get(extractUserId, getLoggedUserValidator, getUser)
   /**
    * @route   PUT /me/:id
    * @desc    Update the logged-in user
