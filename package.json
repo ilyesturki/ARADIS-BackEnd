@@ -7,8 +7,7 @@
   "scripts": {
     "dev": "nodemon --watch 'src/**' --ext 'ts,json' --exec 'npm run build && npm run start'",
     "build": "tsc",
-    "start": "node dist/index.js",
-    "vercel-build": "echo vercel started"
+    "start": "node dist/index.js"
   },
   "author": "Google LLC",
   "license": "Apache-2.0",
