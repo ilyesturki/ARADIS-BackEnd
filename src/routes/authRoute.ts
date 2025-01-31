@@ -28,19 +28,6 @@ const limiter = rateLimit({
 router.use(limiter);
 
 /**
- * @route   POST /verify-sign-up-code
- * @desc    Verify user sign-up code
- * @access  Public
- */
-router.post(
-  "/verify-sign-up-code",
-  uploadUserImage,
-  resizeUserImage,
-  verifySignUpValidator,
-  verifySignUp
-);
-
-/**
  * @route   POST /signin
  * @desc    Authenticate user and get token
  * @access  Public
