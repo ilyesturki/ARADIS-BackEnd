@@ -1,9 +1,7 @@
 import asyncHandler from "express-async-handler";
-import bcrypt from "bcrypt";
 
 import User, { UserType } from "../models/User";
 import ApiError from "../utils/ApiError";
-import generateToken from "../utils/generateToken";
 
 import { Request, Response, NextFunction } from "express";
 import factory from "./factoryService";
@@ -53,11 +51,7 @@ export const createUser = asyncHandler(
     await user.save();
 
     // Construct the activation link
-    const activationUrl = `${
-      process.env.FRONTEND_URL
-    }/auth/activate?token=${activationToken}&email=${encodeURIComponent(
-      user.email
-    )}`;
+    const activationUrl = `${process.env.FRONTEND_URL}/auth/activate?token=${activationToken}`;
 
     // Send email
     try {
@@ -80,28 +74,6 @@ export const createUser = asyncHandler(
   }
 );
 
-// @desc    Get the logged-in user
-// @route   GET /users/me
-// @access  Private
-export const deleteLoggedUser = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.user._id;
-    const password = req.user.password;
-    const user = await User.findById(userId);
-    if (!user) {
-      return next(new ApiError("User not found", 404));
-    }
-    if (user.role === "admin") {
-      return next(new ApiError("You cannot delete an admin user", 400));
-    }
-    if (!(await bcrypt.compare(password, user.password))) {
-      return next(new ApiError("Invalid password", 400));
-    }
-    await user.deleteOne();
-    res.status(204).json({ message: "User deleted successfully" });
-  }
-);
-
 // @desc    Get a list of users
 // @route   GET /users
 // @access  Admin
@@ -110,12 +82,7 @@ export const getUsers = factory.getAll<UserType>(User);
 // @desc    Update a specific user by ID
 // @route   PUT /users/:id
 // @access  Private/Admin
-export const updateUser = factory.updateOne<UserType>(User, [
-  "address.details",
-  "address.governorate",
-  "address.city",
-  "address.postalCode",
-]);
+export const updateUser = factory.updateOne<UserType>(User);
 
 // @desc    Delete a specific user by ID
 // @route   DELETE /users/:id

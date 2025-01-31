@@ -9,38 +9,109 @@ import bcrypt from "bcrypt";
 
 import generateToken from "../utils/generateToken";
 import sendEmail from "../utils/sendEmail";
-import resetCodeEmailTemplate from "../utils/emailTemplate/resetCodeEmailTemplate";
 
 
 import { Request, Response, NextFunction } from "express";
 import ApiError from "../utils/ApiError";
+import confirmationEmailTemplate from "../utils/emailTemplate/confirmationEmailTemplate";
 
 
 
-export const verifySignUp = asyncHandler(
+
+// @desc    Verify activation token and matricule
+// @route   POST /auth/verify-token
+// @access  Public
+export const verifyToken = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { signUpCode, email } = req.body;
-    const hashedSignUpCode = crypto
-      .createHash("sha256")
-      .update(signUpCode)
-      .digest("hex");
-    const user = await User.findOne({
-      email,
-      signUpCode: hashedSignUpCode,
-      signUpCodeExpires: { $gt: Date.now() },
-    });
-    if (!user) {
-      return next(new ApiError("code invalid or expired", 400));
-    }
-    user.status = "active";
-    await user.save();
+    const { token, mat } = req.body;
 
-    // const token = generateToken(user._id);
-    // const userObject = user.toObject();
-    // delete userObject.password;
-    res.status(201).json({ status: "success", message: "user verified" });
+    if (!token || !mat) {
+      return next(new ApiError("Invalid request parameters", 400));
+    }
+
+    // Hash the provided token
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    // Find user by matricule and check activation token
+    const user = await User.findOne({
+      mat,
+      activationToken: hashedToken,
+      activationTokenExpires: { $gt: Date.now() }, // Ensure token is not expired
+    });
+
+    if (!user) {
+      return next(new ApiError("Invalid or expired token", 400));
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Token and matricule verified. Proceed to set password.",
+    });
   }
 );
+
+// @desc    Set password and activate account
+// @route   POST /auth/set-password
+// @access  Public
+export const setPassword = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { token, mat, newPassword } = req.body;
+
+    if (!token || !mat || !newPassword) {
+      return next(new ApiError("Invalid request parameters", 400));
+    }
+
+    // Hash the provided token
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    // Find user by matricule and check activation token
+    const user = await User.findOne({
+      mat,
+      activationToken: hashedToken,
+      activationTokenExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return next(new ApiError("Invalid or expired token", 400));
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    user.passwordChangedAt = new Date();
+
+    // Activate account
+    user.status = "active";
+    user.activationToken = undefined;
+    user.activationTokenExpires = undefined;
+
+    await user.save();
+
+    // Send confirmation email
+    try {
+      await sendEmail(
+        confirmationEmailTemplate(user.firstName, user.email)
+      );
+    } catch (err) {
+      return next(new ApiError("Error sending confirmation email", 500));
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Account activated successfully.",
+    });
+  }
+);
+
+
+
+
+
+
+
+
+
+
 
 export const signIn = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -54,7 +125,7 @@ export const signIn = asyncHandler(
     ) {
       return next(new ApiError("Invalid email or password", 401));
     }
-    const token = generateToken(user._id);
+    const token = generateToken(user.mat);
     const userObject = user.toObject();
     delete userObject.password;
     res.status(200).json({ data: userObject, token });

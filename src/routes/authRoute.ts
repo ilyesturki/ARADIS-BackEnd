@@ -2,7 +2,7 @@ import express from "express";
 import rateLimit from "express-rate-limit";
 const router = express.Router();
 
-import { signIn, verifySignUp } from "../services/authService";
+import { signIn } from "../services/authService";
 import {
   signUpValidator,
   signInValidator,
