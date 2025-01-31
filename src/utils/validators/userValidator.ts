@@ -66,42 +66,6 @@ export const updateLoggedUserValidator = [
     }),
   validatorMiddleware,
 ];
-export const updateLoggedUserPasswordValidator = [
-  paramsSanitizer("id"),
-  bodySanitizer("currentPassword", "password"),
-  param("id").isMongoId().withMessage("Invalid User id format"),
-  body("currentPassword")
-    .notEmpty()
-    .withMessage("Password is required")
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/,
-      "i"
-    )
-    .withMessage(
-      "Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long"
-    )
-    .custom(async (currentPassword, { req }) => {
-      const user = await User.findById(req.params.id);
-      if (!user.provider && !user.providerId) {
-        if (!user || !(await bcrypt.compare(currentPassword, user.password))) {
-          throw new Error("Password Confirmation incorrect");
-        }
-      }
-
-      return true;
-    }),
-  body("password")
-    .notEmpty()
-    .withMessage("Password is required")
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/,
-      "i"
-    )
-    .withMessage(
-      "Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long"
-    ),
-  validatorMiddleware,
-];
 export const deleteLoggedUserValidator = [
   paramsSanitizer("id"),
   bodySanitizer("password"),

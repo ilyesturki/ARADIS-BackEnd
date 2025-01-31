@@ -2,15 +2,7 @@ import express from "express";
 import rateLimit from "express-rate-limit";
 const router = express.Router();
 
-import {
-  signUp,
-  providerSignIn,
-  signIn,
-  forgetPassword,
-  resetPassword,
-  verifyPwResetCode,
-  verifySignUp,
-} from "../services/authService";
+import { signIn, verifySignUp } from "../services/authService";
 import {
   signUpValidator,
   signInValidator,
@@ -33,21 +25,7 @@ const limiter = rateLimit({
   message: "Too many requests from this IP, please try again after 15 minutes",
 });
 
-router.post("/provider-sign-in", providerSignInValidator, providerSignIn);
-
 router.use(limiter);
-/**
- * @route   POST /sign-up
- * @desc    Register a new user
- * @access  Public
- */
-router.post(
-  "/sign-up",
-  uploadUserImage,
-  resizeUserImage,
-  signUpValidator,
-  signUp
-);
 
 /**
  * @route   POST /verify-sign-up-code
@@ -68,44 +46,5 @@ router.post(
  * @access  Public
  */
 router.post("/sign-in", signInValidator, signIn);
-
-/**
- * @route   POST /forget-password
- * @desc    Initiate password reset
- * @access  Public
- */
-router.post(
-  "/forget-password",
-  uploadUserImage,
-  resizeUserImage,
-  forgetPasswordValidator,
-  forgetPassword
-);
-
-/**
- * @route   POST /verify-pw-reset-code
- * @desc    Verify password reset code
- * @access  Public
- */
-router.post(
-  "/verify-pw-reset-code",
-  uploadUserImage,
-  resizeUserImage,
-  verifyPwResetCodeValidator,
-  verifyPwResetCode
-);
-
-/**
- * @route   PUT /reset-password
- * @desc    Reset user password
- * @access  Public
- */
-router.put(
-  "/reset-password",
-  uploadUserImage,
-  resizeUserImage,
-  resetPasswordValidator,
-  resetPassword
-);
 
 export default router;

@@ -7,13 +7,10 @@ import {
   deleteUser,
   getUser,
   getUsers,
-  updateLoggedUserPassword,
-  deleteLoggedUser,
 } from "../services/userService";
 import {
   createUserValidator,
   updateUserValidator,
-  updateLoggedUserPasswordValidator,
   updatePasswordValidator,
   deleteLoggedUserValidator,
   getUserValidator,
@@ -48,33 +45,7 @@ router
     resizeUserImage,
     updateLoggedUserValidator,
     updateUser
-  )
-  /**
-   * @route   DELETE /me/:id
-   * @desc    Delete the logged-in user
-   * @access  Private
-   */
-  .delete(extractUserId, deleteLoggedUserValidator, deleteLoggedUser);
-
-/**
- * @route   PUT /update-password
- * @desc    Update the password of the logged-in user
- * @access  Private
- */
-router.put(
-  "/update-password",
-  extractUserId,
-  uploadUserImage,
-  resizeUserImage,
-  (req, res, next) => {
-    console.log("/*/");
-    console.log(req.params);
-    console.log(req.body);
-    next();
-  },
-  updateLoggedUserPasswordValidator,
-  updateLoggedUserPassword
-);
+  );
 
 // Authorization middleware for admin-only routes
 router.use(allowedTo("admin"));
