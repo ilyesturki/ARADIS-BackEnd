@@ -134,7 +134,7 @@ export const protect = asyncHandler(
     }
 
     interface DecodedTokenType {
-      userId: string;
+      id: string;
       iat: number;
     }
 
@@ -143,7 +143,7 @@ export const protect = asyncHandler(
       process.env.JWT_SECRET_KEY!
     ) as DecodedTokenType;
 
-    const user = await User.findByPk(decodedToken.userId);
+    const user = await User.findByPk(decodedToken.id);
     if (!user) {
       return next(new ApiError("User with this token no longer exists", 401));
     }
