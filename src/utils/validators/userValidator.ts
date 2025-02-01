@@ -100,6 +100,7 @@ export const getLoggedUserValidator: RequestHandler[] = [
 // ADMIN ONLY
 export const createUserValidator = [
   bodySanitizer(
+    "mat",
     "firstName",
     "lastName",
     "email",
@@ -143,7 +144,7 @@ export const createUserValidator = [
       "Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long"
     ),
   body("status")
-    .notEmpty()
+    .optional()
     .isIn(["active", "inactive"])
     .withMessage("status must be active or inactive"),
   body("image").optional().isString().withMessage("image must be a string"),
