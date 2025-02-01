@@ -18,3 +18,4 @@ const extractNonEmptyFields = <T extends Record<string, any>>(
 
   return notEmptyData;
 };
+export default extractNonEmptyFields;
