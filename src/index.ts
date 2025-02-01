@@ -8,6 +8,7 @@ import ApiError from "./utils/ApiError";
 import authRoute from "./routes/authRoute";
 import userRoute from "./routes/userRoute";
 import { Request, Response, NextFunction } from "express";
+import User from "./models/User";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
@@ -15,7 +16,7 @@ const app = express();
 
 // Initialize Sequelize
 const sequelize = dbConnect();
-
+sequelize.addModels([User]);
 (async () => {
   try {
     // Test the database connection

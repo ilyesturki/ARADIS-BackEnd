@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize-typescript";
+import { User } from "../models/User"; // Import the User model
 
 const dbConnect = () => {
   const sequelize = new Sequelize({
@@ -7,7 +8,7 @@ const dbConnect = () => {
     username: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "password",
     database: process.env.DB_NAME || "mydb",
-    models: [__dirname + "/../models"], // Path to your models folder
+    models: [User], // Direct reference to models
     logging: false,
   });
 
@@ -15,6 +16,7 @@ const dbConnect = () => {
 };
 
 export default dbConnect;
+
 
 // import mongoose from "mongoose";
 

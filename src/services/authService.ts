@@ -100,30 +100,23 @@ export const setPassword = asyncHandler(
 export const signIn = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
+    console.log(email, password);
+    const user = await User.findOne({ where: { email } });
 
-    const user = await User.create({
-      mat: "ilyesstorki3",
-      email,
-      phone: "51515151",
-      firstName: "admin",
-      lastName: "admin",
-      status: "active",
-      role: "admin",
-      password,
-    });
+    if (
+      !user ||
+      !user.password ||
+      !(await bcrypt.compare(password, user.password)) ||
+      user.status === "inactive"
+    ) {
+      return next(new ApiError("Invalid email or password", 401));
+    }
 
-    // const user = await User.findOne({ where: { email } });
-
-    // if (!user || !user.password || !(await bcrypt.compare(password, user.password)) || user.status === "inactive") {
-    //   return next(new ApiError("Invalid email or password", 401));
-    // }
-
-    // const token = generateToken(user.mat);
-    await user.save();
+    const token = generateToken(user.mat);
     const userObject = user.toJSON();
     delete userObject.password;
 
-    res.status(201).json({ data: userObject });
+    res.status(200).json({ data: userObject, token });
   }
 );
 
