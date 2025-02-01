@@ -17,7 +17,6 @@ const dbConnect = () => {
 
 export default dbConnect;
 
-
 // import mongoose from "mongoose";
 
 // const dbConnect = () => {

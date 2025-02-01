@@ -17,17 +17,18 @@ const app = express();
 // Initialize Sequelize
 const sequelize = dbConnect();
 sequelize.addModels([User]);
+
 (async () => {
   try {
     // Test the database connection
     await sequelize.authenticate();
-    console.log("Database connection has been established successfully.");
+    console.log("✅ Database connection established successfully.");
 
-    // Synchronize all models
-    await sequelize.sync({ alter: true }); // Use `alter: true` in dev to update schema without dropping data
-    console.log("All models synchronized successfully.");
+    // ⚠️ Do NOT use `alter: true` to avoid index duplication issues.
+    await sequelize.sync(); // Only sync models without altering
+    console.log("✅ All models synchronized successfully.");
   } catch (error) {
-    console.error("Unable to connect to the database:", error);
+    console.error("❌ Unable to connect to the database:", error);
     process.exit(1); // Exit the process if the DB connection fails
   }
 })();
