@@ -1,7 +1,7 @@
 import { Request } from "express";
 
-const parseArrays = (req: Request, fields) => {
-  const parsedArrays = {};
+const parseArrays = (req: Request, fields: string[]): Record<string, any[]> => {
+  const parsedArrays: Record<string, any[]> = {};
 
   fields.forEach((field) => {
     if (req.body[field]) {

@@ -1,9 +1,18 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "sourceMap": true,
-    "outDir": "dist",
-    "esModuleInterop": true
-  }
+    "target": "ES2021", // Modern target for better performance
+    "module": "commonjs", // Required for Node.js
+    "sourceMap": true, // Generates source maps for debugging
+    "outDir": "dist", // Output directory for compiled files
+    "rootDir": "src", // Root directory for source files
+    "strict": true, // Enable strict type-checking
+    "esModuleInterop": true, // Allows better compatibility with CommonJS modules
+    "forceConsistentCasingInFileNames": true, // Enforce consistent file naming
+    "skipLibCheck": true, // Skips type checks for library files for faster compilation
+    "resolveJsonModule": true, // Allow importing JSON files
+    "experimentalDecorators": true, // Enable decorators (required by sequelize-typescript)
+    "emitDecoratorMetadata": true // Emit metadata for decorators (also required)
+  },
+  "include": ["src/**/*"], // Include all files in the `src` directory
+  "exclude": ["node_modules", "dist"] // Exclude unnecessary files
 }

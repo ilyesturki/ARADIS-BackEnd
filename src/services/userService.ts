@@ -1,13 +1,10 @@
 import asyncHandler from "express-async-handler";
-
-import User, { UserType } from "../models/User";
-import ApiError from "../utils/ApiError";
-
 import { Request, Response, NextFunction } from "express";
-import factory from "./factoryService";
-
-import sendEmail from "../utils/sendEmail";
 import crypto from "crypto";
+import User, { UserType } from "../models/User";
+import factory from "./factoryService";
+import ApiError from "../utils/ApiError";
+import sendEmail from "../utils/sendEmail";
 import activationEmailTemplate from "../utils/emailTemplate/activationEmailTemplate ";
 
 // @desc    Create a new user
@@ -15,16 +12,16 @@ import activationEmailTemplate from "../utils/emailTemplate/activationEmailTempl
 // @access  Admin
 export const createUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { mat, email, phone, firstName, lastName } = req.body;
+    const { mat, email, phone, firstName, lastName, image } = req.body;
 
     // Check if user already exists
-    const existingUser = await User.findOne({ mat });
+    const existingUser = await User.findOne({ where: { mat } });
 
     if (existingUser) {
       if (existingUser.status === "active") {
         return next(new ApiError("User already exists", 400));
       } else {
-        await User.findOneAndDelete({ mat }); // Remove inactive user
+        await existingUser.destroy(); // Remove inactive user
       }
     }
 
@@ -36,6 +33,7 @@ export const createUser = asyncHandler(
       firstName,
       lastName,
       status: "pending",
+      image,
     });
 
     // Generate secure activation token
@@ -45,10 +43,10 @@ export const createUser = asyncHandler(
       .update(activationToken)
       .digest("hex");
 
-    user.activationToken = hashedToken;
-    user.activationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours expiration
-
-    await user.save();
+    await user.update({
+      activationToken: hashedToken,
+      activationTokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours expiration
+    });
 
     // Construct the activation link
     const activationUrl = `${process.env.FRONTEND_URL}/auth/activate?token=${activationToken}`;
@@ -62,7 +60,9 @@ export const createUser = asyncHandler(
       // Clean up token if email fails
       user.activationToken = undefined;
       user.activationTokenExpires = undefined;
+
       await user.save();
+
       return next(new ApiError("Error sending email. Try again later.", 500));
     }
 
@@ -77,19 +77,19 @@ export const createUser = asyncHandler(
 // @desc    Get a list of users
 // @route   GET /users
 // @access  Admin
-export const getUsers = factory.getAll<UserType>(User);
+export const getUsers = factory.getAll(User);
 
 // @desc    Update a specific user by ID
 // @route   PUT /users/:id
 // @access  Private/Admin
-export const updateUser = factory.updateOne<UserType>(User);
+export const updateUser = factory.updateOne(User);
 
 // @desc    Delete a specific user by ID
 // @route   DELETE /users/:id
 // @access  Private/Admin
-export const deleteUser = factory.deleteOne<UserType>(User);
+export const deleteUser = factory.deleteOne(User);
 
 // @desc    Get a specific user by ID
 // @route   GET /users/:id
 // @access  Private/Admin
-export const getUser = factory.getOne<UserType>(User);
+export const getUser = factory.getOne(User);

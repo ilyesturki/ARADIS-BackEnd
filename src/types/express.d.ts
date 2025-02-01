@@ -1,5 +1,6 @@
 import { UserType } from "../models/User";
-import { Document, FilterQuery } from "mongoose";
+import { WhereOptions } from "sequelize";
+
 declare global {
   namespace Express {
     interface Request {
@@ -7,7 +8,7 @@ declare global {
       userId?: string;
       file?: Multer.File;
       files?: { [fieldname: string]: Multer.File[] } | Multer.File[];
-      filterObj?: FilterQuery<Document>;
+      filterObj?: WhereOptions; // Replacing Mongoose's FilterQuery with Sequelize's WhereOptions
     }
   }
 }

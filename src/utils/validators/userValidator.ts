@@ -100,22 +100,28 @@ export const getLoggedUserValidator: RequestHandler[] = [
 // ADMIN ONLY
 export const createUserValidator = [
   bodySanitizer(
-    "name",
+    "firstName",
+    "lastName",
     "email",
     "phone",
     "password",
-    "passwordConfirm",
     "status",
-    "address",
     "image"
   ),
-  body("name")
+  body("firstName")
     .notEmpty()
-    .withMessage("name is required")
+    .withMessage("firstName is required")
     .isLength({ min: 3 })
-    .withMessage("Too short name")
+    .withMessage("Too short firstName")
     .isLength({ max: 20 })
-    .withMessage("too long name"),
+    .withMessage("too long firstName"),
+  body("lastName")
+    .notEmpty()
+    .withMessage("lastName is required")
+    .isLength({ min: 3 })
+    .withMessage("Too short lastName")
+    .isLength({ max: 20 })
+    .withMessage("too long lastName"),
   body("email")
     .notEmpty()
     .withMessage("email is required")
@@ -141,27 +147,6 @@ export const createUserValidator = [
     .isIn(["active", "inactive"])
     .withMessage("status must be active or inactive"),
   body("image").optional().isString().withMessage("image must be a string"),
-  body("address")
-    .optional()
-    .isObject()
-    .withMessage("address must be an object")
-    .custom((address) => {
-      const { details, governorate, city, postalCode } = address;
-      if (typeof details !== "string") {
-        throw new Error("details must be a string");
-      }
-      if (typeof governorate !== "string") {
-        throw new Error("governorate must be a string");
-      }
-      if (typeof city !== "string") {
-        throw new Error("city must be a string");
-      }
-      if (typeof postalCode !== "string") {
-        throw new Error("postalCode must be a string");
-      }
-
-      return true;
-    }),
   validatorMiddleware,
 ];
 export const updateUserValidator = [

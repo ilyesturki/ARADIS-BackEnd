@@ -1,23 +1,14 @@
 import User from "../models/User";
-
 import crypto from "crypto";
-
 import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
-
 import bcrypt from "bcrypt";
-
 import generateToken from "../utils/generateToken";
 import sendEmail from "../utils/sendEmail";
-
-
 import { Request, Response, NextFunction } from "express";
 import ApiError from "../utils/ApiError";
 import confirmationEmailTemplate from "../utils/emailTemplate/confirmationEmailTemplate";
-
-
-
-
+import { Op } from "sequelize";
 // @desc    Verify activation token and matricule
 // @route   POST /auth/verify-token
 // @access  Public
@@ -34,9 +25,11 @@ export const verifyToken = asyncHandler(
 
     // Find user by matricule and check activation token
     const user = await User.findOne({
-      mat,
-      activationToken: hashedToken,
-      activationTokenExpires: { $gt: Date.now() }, // Ensure token is not expired
+      where: {
+        mat,
+        activationToken: hashedToken,
+        activationTokenExpires: { [Op.gt]: new Date() }, // Ensure token is not expired
+      },
     });
 
     if (!user) {
@@ -66,32 +59,31 @@ export const setPassword = asyncHandler(
 
     // Find user by matricule and check activation token
     const user = await User.findOne({
-      mat,
-      activationToken: hashedToken,
-      activationTokenExpires: { $gt: Date.now() },
+      where: {
+        mat,
+        activationToken: hashedToken,
+        activationTokenExpires: { [Op.gt]: new Date() },
+      },
     });
 
     if (!user) {
       return next(new ApiError("Invalid or expired token", 400));
     }
 
-    // Hash new password
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
+    user.password = newPassword;
     user.passwordChangedAt = new Date();
 
     // Activate account
     user.status = "active";
     user.activationToken = undefined;
     user.activationTokenExpires = undefined;
+    
 
     await user.save();
 
     // Send confirmation email
     try {
-      await sendEmail(
-        confirmationEmailTemplate(user.firstName, user.email)
-      );
+      await sendEmail(confirmationEmailTemplate(user.firstName, user.email));
     } catch (err) {
       return next(new ApiError("Error sending confirmation email", 500));
     }
@@ -103,71 +95,57 @@ export const setPassword = asyncHandler(
   }
 );
 
-
-
-
-
-
-
-
-
-
-
+// @desc    Sign in user
+// @route   POST /auth/signin
+// @access  Public
 export const signIn = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-    if (
-      !user ||
-      !(await bcrypt.compare(password, user.password)) ||
-      user.status === "inactive"
-    ) {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user || !user.password || !(await bcrypt.compare(password, user.password)) || user.status === "inactive") {
       return next(new ApiError("Invalid email or password", 401));
     }
+
     const token = generateToken(user.mat);
-    const userObject = user.toObject();
+    const userObject = user.toJSON();
     delete userObject.password;
+
     res.status(200).json({ data: userObject, token });
   }
 );
 
+// @desc    Protect routes
 export const protect = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization || null;
     if (!token) {
-      return next(new ApiError("You are not login, please login -_-", 401));
+      return next(new ApiError("You are not logged in, please log in", 401));
     }
 
-    interface decodedTokenType {
+    interface DecodedTokenType {
       userId: string;
       iat: number;
     }
-    const decodedToken = jwt.verify(
-      token,
-      process.env.JWT_SECRET_KEY
-    ) as decodedTokenType;
 
-    const user = await User.findById(decodedToken.userId);
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY!) as DecodedTokenType;
+
+    const user = await User.findByPk(decodedToken.userId);
     if (!user) {
-      return next(new ApiError("user with this token no more exist -_-", 401));
+      return next(new ApiError("User with this token no longer exists", 401));
     }
-    // if (decodedToken.iat < Math.trunc(user.pwUpdatedAt.getTime() / 1000)) {
-    //   return next(
-    //     new ApiError("user changed his password , please login again -_-", 401)
-    //   );
-    // }
+
     req.user = user;
     next();
   }
 );
 
+// @desc    Restrict access to specific roles
 export const allowedTo = (...roles: string[]) =>
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     if (req.user && !roles.includes(req.user.role)) {
-      return next(
-        new ApiError("You are not allowed to access this route", 403)
-      );
+      return next(new ApiError("You are not allowed to access this route", 403));
     }
     next();
   });

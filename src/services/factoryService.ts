@@ -1,13 +1,16 @@
 import { Request, Response, NextFunction } from "express";
 import ApiFeatures from "../utils/ApiFeatures";
 import asyncHandler from "express-async-handler";
-import { Model as MongooseModel, Document, FilterQuery } from "mongoose";
+// import { Model as MongooseModel, Document, FilterQuery } from "mongoose";
+import { ModelStatic, FindOptions, Model } from "sequelize";
 import ApiError from "../utils/ApiError";
 import extractNonEmptyFields from "../utils/extractNonEmptyFields";
 import parseArrays from "../utils/parseArray";
 
 // Create a new document
-export const createOne = <T extends Document>(Model: MongooseModel<T>) =>
+export const createOne = <T extends Model>(
+  Model: ModelStatic<T> // Use ModelStatic for Sequelize model classes
+) =>
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const parsedArr = parseArrays(req, [
       "colors",
@@ -16,90 +19,37 @@ export const createOne = <T extends Document>(Model: MongooseModel<T>) =>
       "address",
     ]);
 
-    const newDoc = await Model.create({ ...req.body, ...parsedArr });
+    // Create a new document with Sequelize's `create` method
+    const newDoc = await Model.create({
+      ...req.body,
+      ...parsedArr,
+    });
+
     res.status(201).json({ data: newDoc });
   });
 
-// Update an existing document by ID
-export const updateOne = <T extends Document>(
-  Model: MongooseModel<T>,
-  addressFields: string[] = []
+// Get all documents with optional filtering, pagination, etc.
+export const getAll = <T extends Model>(
+  Model: ModelStatic<T> // Use ModelStatic instead of ModelCtor
 ) =>
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    let { id } = req.params;
-    // if (!id) {
-    //   id = req.body.userId;
-    // }
-    const parsedArr = parseArrays(req, ["colors", "sizes", "images"]);
-    console.log(req.body);
-    console.log(parsedArr);
+    const apiFeatures = new ApiFeatures<T>(req.query);
 
-    // Extract address fields if provided
-    const addressData = addressFields.reduce((acc, field) => {
-      acc[field] = req.body[field];
+    // Apply filtering, sorting, searching, and pagination
+    apiFeatures.filter().search(Model).sort().limitFields();
 
-      return acc;
-    }, {} as Record<string, any>);
+    // Count documents after filtering
+    const totalCount = await Model.count({
+      where: apiFeatures.queryOptions.where,
+    });
 
-    const notEmptyData = extractNonEmptyFields<T>(
-      { ...req.body, ...parsedArr },
-      Model
+    // Apply pagination after counting
+    apiFeatures.paginate(totalCount);
+
+    // Fetch records
+    const documents = await Model.findAll(
+      apiFeatures.queryOptions as FindOptions
     );
-    console.log(notEmptyData);
-    const document = await Model.findByIdAndUpdate(
-      id,
-      {
-        $set: {
-          ...notEmptyData,
-          ...addressData,
-        },
-      },
-      {
-        new: true,
-      }
-    );
-
-    if (!document) {
-      return next(new ApiError(`No ${Model.modelName} for this id ${id}`, 404));
-    }
-    res.status(200).json({ data: document });
-  });
-
-// Delete a document by ID
-export const deleteOne = <T extends Document>(Model: MongooseModel<T>) =>
-  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
-    const document = await Model.findByIdAndDelete(id);
-
-    if (!document) {
-      return next(new ApiError(`No ${Model.modelName} for this id ${id}`, 404));
-    }
-    res.status(204).send();
-  });
-
-// Get all documents with optional filtering, pagination, etc.
-export const getAll = <T extends Document>(Model: MongooseModel<T>) =>
-  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    // let filter: FilterQuery<T> = {};
-    // if (req.filterObj) {
-    //   filter = req.filterObj;
-    // }
-
-    const apiFeatures = new ApiFeatures(Model.find(), req.query)
-
-      .filter()
-      .search(Model.modelName)
-      .limitFields()
-      .sort();
-
-    // Count documents after filter and search
-    const filteredDocumentsQuery = apiFeatures.mongooseQuery.clone();
-    const documentsCount = await filteredDocumentsQuery.countDocuments();
-
-    // Apply pagination after count
-    apiFeatures.paginate(documentsCount);
-
-    const documents = await apiFeatures.mongooseQuery;
 
     res.status(200).json({
       results: documents.length,
@@ -108,19 +58,79 @@ export const getAll = <T extends Document>(Model: MongooseModel<T>) =>
     });
   });
 
-// Get a single document by ID
-export const getOne = <T extends Document>(Model: MongooseModel<T>) =>
+// Update an existing document by ID
+export const updateOne = <T extends Model>(
+  Model: ModelStatic<T>,
+  addressFields: string[] = []
+) =>
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    let { id } = req.params;
+
+    // Parse arrays (e.g., colors, sizes, images)
+    const parsedArr = parseArrays(req, ["colors", "sizes", "images"]);
+    console.log(req.body);
+    console.log(parsedArr);
+
+    // Extract address fields if provided
+    const addressData = addressFields.reduce((acc, field) => {
+      if (req.body[field]) acc[field] = req.body[field];
+      return acc;
+    }, {} as Record<string, any>);
+
+    // Filter out empty fields
+    const notEmptyData = extractNonEmptyFields<T>(
+      { ...req.body, ...parsedArr },
+      Model
+    );
+    console.log(notEmptyData);
+
+    // Find the document by ID
+    const document = await Model.findByPk(id);
+
+    if (!document) {
+      return next(new ApiError(`No ${Model.name} found for this id ${id}`, 404));
+    }
+
+    // Update the document
+    await document.update({
+      ...notEmptyData,
+      ...addressData,
+    });
+
+    res.status(200).json({ data: document });
+  });
+
+// Delete a document by ID
+export const deleteOne = <T extends Model>(Model: ModelStatic<T>) =>
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    let document;
-    // if (Model.modelName === "User") {
-    //   document = await Model.findById(id).populate("basket");
-    // } else {
-    document = await Model.findById(id);
-    // }
+
+    const document = await Model.findByPk(id);
+
     if (!document) {
-      return next(new ApiError(`No ${Model.modelName} for this id ${id}`, 404));
+      return next(
+        new ApiError(`No ${Model.name} found for this id ${id}`, 404)
+      );
     }
+
+    await document.destroy();
+    res.status(204).send();
+  });
+
+// Get a single document by ID
+export const getOne = <T extends Model>(Model: ModelStatic<T>) =>
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    // Fetch the document by primary key
+    const document = await Model.findByPk(id);
+
+    if (!document) {
+      return next(
+        new ApiError(`No ${Model.name} found for this id ${id}`, 404)
+      );
+    }
+
     res.status(200).json({ data: document });
   });
 
