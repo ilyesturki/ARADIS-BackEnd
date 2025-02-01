@@ -100,17 +100,7 @@ export const setPassword = asyncHandler(
 export const signIn = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
-
-    const user = await User.create({
-      mat: "00",
-      email,
-      phone: "51515151",
-      firstName: "admin",
-      lastName: "admin",
-      status: "active",
-      password,
-    });
-    // const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email } });
     console.log(user);
     console.log("/////");
     console.log(user?.dataValues);
