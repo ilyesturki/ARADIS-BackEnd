@@ -118,8 +118,8 @@ export const signIn = asyncHandler(
     }
 
     const token = generateToken(user.dataValues.mat);
-    const userObject = user.dataValues;
-    delete userObject.dataValues.password;
+
+    const { password: _, ...userObject } = user.dataValues;
 
     res.status(200).json({ data: userObject, token });
   }
