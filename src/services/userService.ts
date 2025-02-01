@@ -14,8 +14,9 @@ export const createUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { mat, email, phone, firstName, lastName, image } = req.body;
 
+    console.log(mat, email, phone, firstName, lastName, image);
     // Check if user already exists
-    const existingUser = await User.findOne({ where: { mat } });
+    const existingUser = await User.findOne({ where: { mat: mat } });
 
     if (existingUser) {
       if (existingUser.status === "active") {
