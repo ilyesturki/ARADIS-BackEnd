@@ -103,6 +103,8 @@ export const signIn = asyncHandler(
     console.log(email, password);
     const user = await User.findOne({ where: { email } });
     console.log(user);
+    console.log(user?.dataValues);
+    console.log(user?.dataValues?.password);
     console.log(
       user?.password ? await bcrypt.compare(password, user.password) : ""
     );
