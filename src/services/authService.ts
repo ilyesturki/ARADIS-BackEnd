@@ -144,6 +144,12 @@ export const protect = asyncHandler(
     ) as DecodedTokenType;
 
     const user = await User.findByPk(decodedToken.id);
+
+    console.log("***********");
+    console.log(token);
+    console.log(decodedToken);
+    console.log(user);
+    console.log("***********");
     if (!user) {
       return next(new ApiError("User with this token no longer exists", 401));
     }
