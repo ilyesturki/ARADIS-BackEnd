@@ -7,6 +7,7 @@ import {
   Unique,
   AllowNull,
   PrimaryKey,
+  AutoIncrement,
   BeforeSave,
 } from "sequelize-typescript";
 import bcrypt from "bcrypt";
@@ -20,8 +21,13 @@ import bcrypt from "bcrypt";
   timestamps: true, // Automatically adds createdAt and updatedAt fields
 })
 export class User extends Model {
-  // Matricule (Primary Unique Identifier)
+  // User ID (Auto-incremented Primary Key)
   @PrimaryKey
+  @AutoIncrement
+  @Column(DataType.INTEGER)
+  id!: number;
+
+  // Matricule (Unique Identifier)
   @Unique
   @Column({
     type: DataType.STRING,
@@ -119,6 +125,7 @@ export class User extends Model {
 
 // TypeScript Interface for User
 export interface UserType {
+  id: number;
   mat: string;
   firstName: string;
   lastName: string;
