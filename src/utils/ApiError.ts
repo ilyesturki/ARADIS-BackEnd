@@ -5,6 +5,10 @@ class ApiError extends Error {
       super(message);
       this.statusCode = statusCode;
       this.status = `${statusCode}`.startsWith("4") ? "Fail" : "Error";
+
+      // Ensures proper inheritance in TypeScript
+      Object.setPrototypeOf(this, ApiError.prototype);
+      Error.captureStackTrace(this, this.constructor);
     }
   }
   

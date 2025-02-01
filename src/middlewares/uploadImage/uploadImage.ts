@@ -1,4 +1,4 @@
-import multer from "multer";
+import multer, { FileFilterCallback } from "multer";
 import ApiError from "../../utils/ApiError";
 
 import { Request } from "express";
@@ -8,12 +8,12 @@ const multerOptions = () => {
   const multerFilter = function (
     req: Request,
     file: { mimetype: string },
-    cb: (arg0: ApiError, arg1: boolean) => void
+    cb: FileFilterCallback
   ) {
     if (file.mimetype.split("/")[0] === "image") {
       cb(null, true);
     } else {
-      cb(new ApiError("only Images allowed -_-", 400), false);
+      cb(new ApiError("only Images allowed -_-", 400));
     }
   };
 
