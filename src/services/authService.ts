@@ -101,12 +101,18 @@ export const signIn = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
     const user = await User.findOne({ where: { email } });
-
+    console.log(user);
+    console.log("/////");
+    console.log(user?.dataValues);
+    console.log("/////");
+    console.log(user?.dataValues?.password);
+    console.log("/////");
+    console.log(await bcrypt.compare(password, user?.dataValues?.password));
     if (
       !user ||
       !user?.dataValues?.password ||
       !(await bcrypt.compare(password, user?.dataValues?.password)) ||
-      user.status === "inactive"
+      user.status !== "active"
     ) {
       return next(new ApiError("Invalid email or password", 401));
     }
