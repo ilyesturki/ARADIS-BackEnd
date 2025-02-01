@@ -109,11 +109,9 @@ export class User extends Model {
   // Hash password before saving
   @BeforeSave
   static async hashPassword(instance: User) {
+    // const salt = process.env.BCRYPT_SALT ? +process.env.BCRYPT_SALT : 10;
     if (instance.password) {
-      instance.password = await bcrypt.hash(
-        instance.password,
-        process.env.BCRYPT_SALT ? +process.env.BCRYPT_SALT : 10
-      );
+      instance.password = await bcrypt.hash(instance.password, 10);
     }
   }
 
