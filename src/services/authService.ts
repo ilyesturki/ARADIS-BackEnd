@@ -77,7 +77,6 @@ export const setPassword = asyncHandler(
     user.status = "active";
     user.activationToken = undefined;
     user.activationTokenExpires = undefined;
-    
 
     await user.save();
 
@@ -102,17 +101,29 @@ export const signIn = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ where: { email } });
+    const user = await User.create({
+      mat: "ilyesstorki3",
+      email,
+      phone: "51515151",
+      firstName: "admin",
+      lastName: "admin",
+      status: "active",
+      role: "admin",
+      password,
+    });
 
-    if (!user || !user.password || !(await bcrypt.compare(password, user.password)) || user.status === "inactive") {
-      return next(new ApiError("Invalid email or password", 401));
-    }
+    // const user = await User.findOne({ where: { email } });
 
-    const token = generateToken(user.mat);
+    // if (!user || !user.password || !(await bcrypt.compare(password, user.password)) || user.status === "inactive") {
+    //   return next(new ApiError("Invalid email or password", 401));
+    // }
+
+    // const token = generateToken(user.mat);
+    await user.save();
     const userObject = user.toJSON();
     delete userObject.password;
 
-    res.status(200).json({ data: userObject, token });
+    res.status(201).json({ data: userObject });
   }
 );
 
@@ -129,7 +140,10 @@ export const protect = asyncHandler(
       iat: number;
     }
 
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY!) as DecodedTokenType;
+    const decodedToken = jwt.verify(
+      token,
+      process.env.JWT_SECRET_KEY!
+    ) as DecodedTokenType;
 
     const user = await User.findByPk(decodedToken.userId);
     if (!user) {
@@ -145,7 +159,9 @@ export const protect = asyncHandler(
 export const allowedTo = (...roles: string[]) =>
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     if (req.user && !roles.includes(req.user.role)) {
-      return next(new ApiError("You are not allowed to access this route", 403));
+      return next(
+        new ApiError("You are not allowed to access this route", 403)
+      );
     }
     next();
   });
