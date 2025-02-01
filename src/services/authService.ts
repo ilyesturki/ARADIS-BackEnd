@@ -117,7 +117,7 @@ export const signIn = asyncHandler(
       return next(new ApiError("Invalid email or password", 401));
     }
 
-    const token = generateToken(user.dataValues.mat);
+    const token = generateToken(user.dataValues.id);
 
     const { password: _, ...userObject } = user.dataValues;
 
