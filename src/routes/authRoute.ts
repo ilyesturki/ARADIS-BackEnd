@@ -2,7 +2,7 @@ import express from "express";
 import rateLimit from "express-rate-limit";
 const router = express.Router();
 
-import { signIn } from "../services/authService";
+import { setPassword, signIn, verifyToken } from "../services/authService";
 import {
   signUpValidator,
   signInValidator,
@@ -32,6 +32,9 @@ router.use(limiter);
  * @desc    Authenticate user and get token
  * @access  Public
  */
+
+router.post("/verify-token", verifyToken);
+router.post("/set-password", setPassword);
 router.post("/sign-in", signInValidator, signIn);
 
 export default router;
