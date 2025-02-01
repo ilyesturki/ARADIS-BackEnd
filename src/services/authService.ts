@@ -102,7 +102,10 @@ export const signIn = asyncHandler(
     const { email, password } = req.body;
     console.log(email, password);
     const user = await User.findOne({ where: { email } });
-
+    console.log(user);
+    console.log(
+      user?.password ? await bcrypt.compare(password, user.password) : ""
+    );
     if (
       !user ||
       !user.password ||
