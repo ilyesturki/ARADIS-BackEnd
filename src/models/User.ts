@@ -110,7 +110,10 @@ export class User extends Model {
   @BeforeSave
   static async hashPassword(instance: User) {
     if (instance.password) {
-      instance.password = await bcrypt.hash(instance.password, process.env.BCRYPT_SALT  || 10);
+      instance.password = await bcrypt.hash(
+        instance.password,
+        process.env.BCRYPT_SALT ? +process.env.BCRYPT_SALT : 10
+      );
     }
   }
 
