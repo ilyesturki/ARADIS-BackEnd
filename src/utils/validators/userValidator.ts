@@ -186,7 +186,7 @@ export const updateUserValidator = [
 export const updatePasswordValidator = [
   paramsSanitizer("id"),
   bodySanitizer("password", "passwordConfirm"),
-  param("id").isMongoId().withMessage("Invalid User id format"),
+  param("id").notEmpty().withMessage("id is required"),
   body("password")
     .notEmpty()
     .withMessage("Password is required")
@@ -206,7 +206,7 @@ export const deleteUserValidator = [
 ];
 export const getUserValidator = [
   paramsSanitizer("id"),
-  param("id").isMongoId().withMessage("Invalid User id format"),
+  param("id").notEmpty().withMessage("id is required"),
   validatorMiddleware,
 ];
 export const getAllValidator = [
