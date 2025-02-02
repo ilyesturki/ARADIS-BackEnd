@@ -105,10 +105,14 @@ export const createUserValidator = [
     "lastName",
     "email",
     "phone",
-    "password",
-    "status",
+    "role",
     "image"
   ),
+  body("mat")
+    .notEmpty()
+    .withMessage("mat is required")
+    .isLength({ min: 8, max: 8 })
+    .withMessage("mat must be 8 characters long"),
   body("firstName")
     .notEmpty()
     .withMessage("firstName is required")
@@ -133,20 +137,11 @@ export const createUserValidator = [
     .withMessage("phone is required")
     .isMobilePhone(["ar-TN"])
     .withMessage("Invalid phone number only accepted TN Phone numbers"),
-  body("password")
-    .notEmpty()
-    .withMessage("Password is required")
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/,
-      "i"
-    )
-    .withMessage(
-      "Password must contain at least one uppercase letter, one lowercase letter, one number, one special character, and be at least 8 characters long"
-    ),
-  body("status")
+
+  body("role")
     .optional()
-    .isIn(["active", "inactive"])
-    .withMessage("status must be active or inactive"),
+    .isIn(["user", "admin"])
+    .withMessage("role must be user or admin"),
   body("image").optional().isString().withMessage("image must be a string"),
   validatorMiddleware,
 ];
