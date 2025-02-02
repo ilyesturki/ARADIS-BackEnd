@@ -59,23 +59,14 @@ export const getAll = <T extends Model>(
   });
 
 // Update an existing document by ID
-export const updateOne = <T extends Model>(
-  Model: ModelStatic<T>,
-  addressFields: string[] = []
-) =>
+export const updateOne = <T extends Model>(Model: ModelStatic<T>) =>
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     let { id } = req.params;
 
     // Parse arrays (e.g., colors, sizes, images)
-    const parsedArr = parseArrays(req, ["colors", "sizes", "images"]);
+    const parsedArr = parseArrays(req, ["images"]);
     console.log(req.body);
     console.log(parsedArr);
-
-    // Extract address fields if provided
-    const addressData = addressFields.reduce((acc, field) => {
-      if (req.body[field]) acc[field] = req.body[field];
-      return acc;
-    }, {} as Record<string, any>);
 
     // Filter out empty fields
     const notEmptyData = extractNonEmptyFields<T>(
@@ -88,13 +79,14 @@ export const updateOne = <T extends Model>(
     const document = await Model.findByPk(id);
 
     if (!document) {
-      return next(new ApiError(`No ${Model.name} found for this id ${id}`, 404));
+      return next(
+        new ApiError(`No ${Model.name} found for this id ${id}`, 404)
+      );
     }
 
     // Update the document
     await document.update({
       ...notEmptyData,
-      ...addressData,
     });
 
     res.status(200).json({ data: document });
