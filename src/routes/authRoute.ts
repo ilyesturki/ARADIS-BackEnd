@@ -33,8 +33,8 @@ router.use(limiter);
  * @access  Public
  */
 
-router.post("/verify-token", verifyToken);
-router.post("/set-password", setPassword);
+router.post("/verify-token", uploadUserImage, resizeUserImage, verifyToken);
+router.post("/set-password", uploadUserImage, resizeUserImage, setPassword);
 router.post("/sign-in", signInValidator, signIn);
 
 export default router;
