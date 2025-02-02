@@ -4,17 +4,16 @@ const extractNonEmptyFields = <T extends Record<string, any>>(
 ): Partial<T> => {
   const notEmptyData: Partial<T> = {};
 
-  for (const key of Object.keys(model.schema.paths)) {
-    if (requestBody[key]) {
-      notEmptyData[key as keyof T] = requestBody[key]; // Type assertion here
+  // Sequelize does not have "schema.paths", instead, we use "rawAttributes"
+  const modelAttributes = Object.keys(model.rawAttributes);
+
+  for (const key of modelAttributes) {
+    if (requestBody[key] !== undefined && requestBody[key] !== null) {
+      notEmptyData[key as keyof T] = requestBody[key]; // Type assertion
     }
   }
 
-  console.log("//");
-  console.log(Object.keys(model.schema.paths));
-  console.log(requestBody);
-  console.log(notEmptyData);
-  console.log("//");
+  console.log("Extracted fields:", notEmptyData);
 
   return notEmptyData;
 };
