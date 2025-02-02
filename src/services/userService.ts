@@ -12,8 +12,8 @@ import activationEmailTemplate from "../utils/emailTemplate/activationEmailTempl
 // @access  Admin
 export const createUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { mat, email, phone, firstName, lastName, image } = req.body;
-
+    const { mat,firstName, lastName,role, email, phone,  image } = req.body;
+   
     console.log(mat, email, phone, firstName, lastName, image);
     // Check if user already exists
     const existingUser = await User.findOne({ where: { mat: mat } });
@@ -29,10 +29,11 @@ export const createUser = asyncHandler(
     // Create new user (status: pending activation)
     const user = await User.create({
       mat,
-      email,
-      phone,
       firstName,
       lastName,
+      role,
+      email,
+      phone,
       status: "pending",
       image,
     });
