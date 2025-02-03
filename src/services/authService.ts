@@ -101,6 +101,7 @@ export const signIn = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
     const user = await User.findOne({ where: { email } });
+    console.log(email, password);
     console.log(user);
     console.log("/////");
     console.log(user?.dataValues);
