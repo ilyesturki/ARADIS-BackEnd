@@ -25,7 +25,7 @@ export const updateLoggedUserValidator = [
     "emailSecurityNotifications",
     "phoneSecurityNotifications"
   ),
-  param("id").isMongoId().withMessage("Invalid User id format"),
+  param("id").notEmpty().withMessage("id is required"),
   body("name")
     .optional()
     .isLength({ min: 3 })
@@ -69,7 +69,7 @@ export const updateLoggedUserValidator = [
 export const deleteLoggedUserValidator = [
   paramsSanitizer("id"),
   bodySanitizer("password"),
-  param("id").isMongoId().withMessage("Invalid User ID format"),
+  param("id").notEmpty().withMessage("id is required"),
   body("password")
     .optional()
     .matches(
@@ -93,7 +93,7 @@ export const deleteLoggedUserValidator = [
 ];
 export const getLoggedUserValidator: RequestHandler[] = [
   paramsSanitizer("id"),
-  param("id").isMongoId().withMessage("Invalid User id format"),
+  param("id").notEmpty().withMessage("id is required"),
   validatorMiddleware,
 ];
 

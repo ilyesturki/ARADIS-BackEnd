@@ -12,7 +12,6 @@ import {
   createUserValidator,
   updateUserValidator,
   updatePasswordValidator,
-  deleteLoggedUserValidator,
   getUserValidator,
   deleteUserValidator,
   updateLoggedUserValidator,

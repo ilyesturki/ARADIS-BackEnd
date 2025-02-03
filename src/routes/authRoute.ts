@@ -4,13 +4,9 @@ const router = express.Router();
 
 import { setPassword, signIn, verifyToken } from "../services/authService";
 import {
-  signUpValidator,
+  verifyTokenValidator,
+  setPasswordValidator,
   signInValidator,
-  forgetPasswordValidator,
-  verifyPwResetCodeValidator,
-  resetPasswordValidator,
-  verifySignUpValidator,
-  providerSignInValidator,
 } from "../utils/validators/authValidator";
 
 import {
@@ -33,8 +29,20 @@ router.use(limiter);
  * @access  Public
  */
 
-router.post("/verify-token", uploadUserImage, resizeUserImage, verifyToken);
-router.post("/set-password", uploadUserImage, resizeUserImage, setPassword);
+router.post(
+  "/verify-token",
+  uploadUserImage,
+  resizeUserImage,
+  verifyTokenValidator,
+  verifyToken
+);
+router.post(
+  "/set-password",
+  uploadUserImage,
+  resizeUserImage,
+  setPasswordValidator,
+  setPassword
+);
 router.post("/sign-in", signInValidator, signIn);
 
 export default router;
