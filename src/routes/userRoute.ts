@@ -26,7 +26,7 @@ import extractUserId from "../middlewares/extractUserId";
 const router = express.Router();
 
 // Protect all routes below this middleware with authentication
-router.use(protect);
+// router.use(protect);
 
 // Routes for operations on the logged-in user by ID
 // router.use("/me/:id", extractUserId);
