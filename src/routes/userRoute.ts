@@ -47,7 +47,7 @@ router
   );
 
 // Authorization middleware for admin-only routes
-router.use(allowedTo("admin"));
+// router.use(allowedTo("admin"));
 
 router
   .route("/")
