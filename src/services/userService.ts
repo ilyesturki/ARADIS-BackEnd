@@ -51,8 +51,9 @@ export const createUser = asyncHandler(
     });
 
     // Construct the activation link
-    const activationUrl = `${process.env.FRONTEND_URL}/auth/activate?token=${activationToken}`;
-
+    // const activationUrl = `${process.env.FRONTEND_URL}/auth/activate?token=${activationToken}`;
+    const activationUrl = `https://9000-idx-aradis-frontend-1739358595337.cluster-4ezwrnmkojawstf2k7vqy36oe6.cloudworkstations.dev/auth/activate?token=${activationToken}`;
+    
     // Send email
     try {
       await sendEmail(
