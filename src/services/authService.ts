@@ -108,7 +108,7 @@ export const signIn = asyncHandler(
     console.log("/////");
     console.log(user?.dataValues?.password);
     console.log("/////");
-    console.log(await bcrypt.compare(password, user?.dataValues?.password));
+    // console.log(await bcrypt.compare(password, user?.dataValues?.password));
     if (
       !user ||
       !user?.dataValues?.password ||

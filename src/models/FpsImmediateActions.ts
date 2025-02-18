@@ -33,3 +33,6 @@ export class FpsImmediateActions extends Model<FpsImmediateActionsType> {
   @Column(DataType.JSONB)
   immediatActions?: object; // Should be `ImmediatActionsType[]`
 }
+
+
+export default FpsImmediateActions;

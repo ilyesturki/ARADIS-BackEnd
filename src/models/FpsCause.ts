@@ -24,3 +24,6 @@ export class FpsCause extends Model<FpsCauseType> {
   @Column(DataType.ARRAY(DataType.STRING))
   whyList!: string[];
 }
+
+
+export default FpsCause;

@@ -20,7 +20,7 @@ import bcrypt from "bcrypt";
   tableName: "users",
   timestamps: true, // Automatically adds createdAt and updatedAt fields
 })
-export class User extends Model {
+class User extends Model {
   // User ID (Auto-incremented Primary Key)
   @PrimaryKey
   @AutoIncrement

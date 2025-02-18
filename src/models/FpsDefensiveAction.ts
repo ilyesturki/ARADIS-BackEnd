@@ -12,7 +12,7 @@ import { FpsDefensiveActionType } from "../types/FpsDefensiveActionType";
   tableName: "fps_defensive_actions",
   timestamps: true,
 })
-export class FpsDefensiveAction extends Model<FpsDefensiveActionType> {
+class FpsDefensiveAction extends Model<FpsDefensiveActionType> {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
@@ -30,3 +30,5 @@ export class FpsDefensiveAction extends Model<FpsDefensiveActionType> {
   @Column(DataType.STRING)
   quand!: string;
 }
+
+export default FpsDefensiveAction;

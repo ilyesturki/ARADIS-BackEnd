@@ -18,7 +18,7 @@ import { FpsCause } from "./FpsCause";
   tableName: "fps",
   timestamps: true,
 })
-export class Fps extends Model{
+class Fps extends Model{
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
@@ -55,3 +55,5 @@ export class Fps extends Model{
   @BelongsTo(() => FpsImmediateActions)
   immediatActions?: FpsImmediateActions;
 }
+
+export default Fps;

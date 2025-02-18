@@ -1,8 +1,8 @@
-import { Fps } from "../models/Fps";
-import { FpsProblem } from "../models/FpsProblem";
-import { FpsImmediateActions } from "../models/FpsImmediateActions";
-import { FpsCause } from "../models/FpsCause";
-import { FpsDefensiveAction } from "../models/FpsDefensiveAction";
+import Fps from "../models/Fps";
+import FpsProblem from "../models/FpsProblem";
+import FpsImmediateActions from "../models/FpsImmediateActions";
+import FpsCause from "../models/FpsCause";
+import FpsDefensiveAction from "../models/FpsDefensiveAction";
 import asyncHandler from "express-async-handler";
 import { Request, Response, NextFunction } from "express";
 import ApiError from "../utils/ApiError";

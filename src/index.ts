@@ -10,6 +10,11 @@ import userRoute from "./routes/userRoute";
 import fpsRoute from "./routes/fpsRoute";
 import { Request, Response, NextFunction } from "express";
 import User from "./models/User";
+import Fps from "./models/Fps";
+import FpsProblem from "./models/FpsProblem";
+import FpsImmediateActions from "./models/FpsImmediateActions";
+import FpsCause from "./models/FpsCause";
+import FpsDefensiveAction from "./models/FpsDefensiveAction";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
@@ -17,7 +22,14 @@ const app = express();
 
 // Initialize Sequelize
 const sequelize = dbConnect();
-sequelize.addModels([User]);
+sequelize.addModels([
+  User,
+  Fps,
+  FpsProblem,
+  FpsImmediateActions,
+  FpsCause,
+  FpsDefensiveAction,
+]);
 
 (async () => {
   try {
