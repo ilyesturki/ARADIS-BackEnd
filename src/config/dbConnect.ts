@@ -1,5 +1,10 @@
 import { Sequelize } from "sequelize-typescript";
-import { User } from "../models/User"; // Import the User model
+import User from "../models/User";
+import Fps from "../models/Fps";
+import FpsProblem from "../models/FpsProblem";
+import FpsImmediateActions from "../models/FpsImmediateActions";
+import FpsCause from "../models/FpsCause";
+import FpsDefensiveAction from "../models/FpsDefensiveAction";
 
 const dbConnect = () => {
   const sequelize = new Sequelize({
@@ -8,7 +13,14 @@ const dbConnect = () => {
     username: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "password",
     database: process.env.DB_NAME || "mydb",
-    models: [User], // Direct reference to models
+    models: [
+      User,
+      Fps,
+      FpsProblem,
+      FpsImmediateActions,
+      FpsCause,
+      FpsDefensiveAction,
+    ], // Direct reference to models
     logging: false,
   });
 
