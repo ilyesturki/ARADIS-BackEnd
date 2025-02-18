@@ -30,7 +30,7 @@ class FpsProblem extends Model {
   )
   type!: string;
 
-  @Column(DataType.STRING)
+  @Column(DataType.DATE)
   quoi!: string;
 
   @Column(DataType.STRING)
@@ -55,16 +55,17 @@ class FpsProblem extends Model {
   combien!: string;
 
   @Column(DataType.STRING)
-  pourqoui!: string;
+  pourquoi!: string;
 
   @Column(DataType.STRING)
   image?: string;
 
-  @Column(DataType.ARRAY(DataType.STRING))
+  // Change this line to use JSON instead of an array of strings
+  @Column(DataType.JSON)
   images?: string[];
 
   @Column(DataType.BOOLEAN)
-  clientRisck!: boolean;
+  clientRisk!: boolean;
 }
 
 export default FpsProblem;

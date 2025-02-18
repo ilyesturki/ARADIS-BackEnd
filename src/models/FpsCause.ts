@@ -12,18 +12,19 @@ import { FpsCauseType } from "../types/FpsCauseType";
   tableName: "fps_causes",
   timestamps: true,
 })
-export class FpsCause extends Model{
+export class FpsCause extends Model {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
   id!: number;
 
-  @Column(DataType.ARRAY(DataType.STRING))
+  // Change this line to use JSON instead of an array of strings
+  @Column(DataType.JSON)
   causeList!: string[];
 
-  @Column(DataType.ARRAY(DataType.STRING))
+  // Change this line to use JSON instead of an array of strings
+  @Column(DataType.JSON)
   whyList!: string[];
 }
-
 
 export default FpsCause;

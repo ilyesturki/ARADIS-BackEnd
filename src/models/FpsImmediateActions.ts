@@ -6,33 +6,37 @@ import {
   PrimaryKey,
   AutoIncrement,
 } from "sequelize-typescript";
-import { FpsImmediateActionsType } from "../types/FpsImmediateActionsType";
+import {
+  FpsImmediateActionsType,
+  ImmediatActionsType,
+  SortingResultsType,
+} from "../types/FpsImmediateActionsType";
 
 @Table({
   tableName: "fps_immediate_actions",
   timestamps: true,
 })
-export class FpsImmediateActions extends Model{
+export class FpsImmediateActions extends Model {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
   id!: number;
 
-  @Column(DataType.ARRAY(DataType.STRING))
-  alert?: string[];
+  // Change this to JSONB for more structured data storage
+  @Column(DataType.JSON)
+  alert?: string[]; // Example structure, customize as needed
 
   @Column(DataType.BOOLEAN)
   startSorting?: boolean;
 
   @Column(DataType.JSONB)
-  sortingResults?: object; // Should be `SortingResultsType[]` but needs JSON support
+  sortingResults?: SortingResultsType[];
 
   @Column(DataType.STRING)
   concludeFromSorting?: string;
 
   @Column(DataType.JSONB)
-  immediatActions?: object; // Should be `ImmediatActionsType[]`
+  immediatActions?: ImmediatActionsType[];
 }
-
 
 export default FpsImmediateActions;
