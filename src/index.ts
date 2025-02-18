@@ -7,6 +7,7 @@ import globalError from "./middlewares/globalError";
 import ApiError from "./utils/ApiError";
 import authRoute from "./routes/authRoute";
 import userRoute from "./routes/userRoute";
+import fpsRoute from "./routes/fpsRoute";
 import { Request, Response, NextFunction } from "express";
 import User from "./models/User";
 
@@ -44,6 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/auth", authRoute);
 app.use("/users", userRoute);
+app.use("/fps", fpsRoute);
 
 // Handle undefined routes
 app.use("*", (req: Request, res: Response, next: NextFunction) => {

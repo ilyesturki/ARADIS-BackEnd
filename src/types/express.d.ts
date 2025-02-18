@@ -11,4 +11,4 @@ declare global {
       filterObj?: WhereOptions; // Replacing Mongoose's FilterQuery with Sequelize's WhereOptions
     }
   }
-}
+} 

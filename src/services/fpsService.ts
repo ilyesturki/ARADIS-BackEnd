@@ -1,0 +1,246 @@
+import { Fps } from "../models/Fps";
+import { FpsProblem } from "../models/FpsProblem";
+import { FpsImmediateActions } from "../models/FpsImmediateActions";
+import { FpsCause } from "../models/FpsCause";
+import { FpsDefensiveAction } from "../models/FpsDefensiveAction";
+import asyncHandler from "express-async-handler";
+import { Request, Response, NextFunction } from "express";
+import ApiError from "../utils/ApiError";
+
+// @desc    Create or update the problem part in FPS
+// @route   POST /fps/problem
+// @access  Private
+export const createOrUpdateFpsProblem = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const {
+      type,
+      quoi,
+      ref,
+      quand,
+      ou,
+      userCategory,
+      userService,
+      comment,
+      combien,
+      pourqoui,
+      image,
+      images,
+      clientRisck,
+    } = req.body;
+    const { id: fpsId } = req.params;
+
+    let fps = await Fps.findOne({ where: { fpsId } });
+    let fpsProblem;
+    if (!fps) {
+      const fpsProblem = await FpsProblem.create({
+        type,
+        quoi,
+        ref,
+        quand,
+        ou,
+        userCategory,
+        userService,
+        comment,
+        combien,
+        pourqoui,
+        image,
+        images,
+        clientRisck,
+      });
+      fps = await Fps.create({ fpsId, problemId: fpsProblem.id });
+    } else {
+      fpsProblem = await FpsProblem.findByPk(fps.problemId);
+      if (fpsProblem) {
+        await fpsProblem.update({
+          type,
+          quoi,
+          ref,
+          quand,
+          ou,
+          userCategory,
+          userService,
+          comment,
+          combien,
+          pourqoui,
+          image,
+          images,
+          clientRisck,
+        });
+      }
+      if (!fpsProblem) {
+        const fpsProblem = await FpsProblem.create({
+          type,
+          quoi,
+          ref,
+          quand,
+          ou,
+          userCategory,
+          userService,
+          comment,
+          combien,
+          pourqoui,
+          image,
+          images,
+          clientRisck,
+        });
+        await fps.update({ problemId: fpsProblem.id });
+      }
+    }
+
+    res.status(201).json({
+      status: "success",
+      message: "Fps problem created or updated successfully.",
+      data: {
+        fpsId: fps.fpsId,
+        problem: fpsProblem,
+      },
+    });
+  }
+);
+
+// @desc    Create or update the immediate actions part in FPS
+// @route   POST /fps/immediate-actions
+// @access  Private
+export const createOrUpdateFpsImmediateActions = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const {
+      alert,
+      startSorting,
+      sortingResults,
+      concludeFromSorting,
+      immediatActions,
+    } = req.body;
+    const { id: fpsId } = req.params;
+    const fps = await Fps.findOne({ where: { fpsId } });
+    if (!fps) {
+      return next(
+        new ApiError("FPS record not found for the provided fpsId.", 404)
+      );
+    }
+
+    let fpsImmediateActions;
+    if (fps.immediatActionsId) {
+      fpsImmediateActions = await FpsImmediateActions.findByPk(
+        fps.immediatActionsId
+      );
+      if (fpsImmediateActions) {
+        await fpsImmediateActions.update({
+          alert,
+          startSorting,
+          sortingResults,
+          concludeFromSorting,
+          immediatActions,
+        });
+      }
+    }
+
+    if (!fpsImmediateActions) {
+      fpsImmediateActions = await FpsImmediateActions.create({
+        alert,
+        startSorting,
+        sortingResults,
+        concludeFromSorting,
+        immediatActions,
+      });
+      await fps.update({ immediatActionsId: fpsImmediateActions.id });
+    }
+
+    // Step 5: Respond with the FPS immediate actions data
+    res.status(201).json({
+      status: "success",
+      message: "Immediate actions created or updated successfully.",
+      data: {
+        fpsId: fps.fpsId,
+        immediateActions: fpsImmediateActions,
+      },
+    });
+  }
+);
+
+// @desc    Create or update the cause part in FPS
+// @route   POST /fps/cause
+// @access  Private
+export const createOrUpdateFpsCause = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { causeList, whyList } = req.body;
+    const { id: fpsId } = req.params;
+    const fps = await Fps.findOne({ where: { fpsId } });
+    if (!fps) {
+      return next(
+        new ApiError("FPS record not found for the provided fpsId.", 404)
+      );
+    }
+
+    let fpsCause;
+    if (fps.causeId) {
+      fpsCause = await FpsCause.findByPk(fps.causeId);
+      if (fpsCause) {
+        await fpsCause.update({ causeList, whyList });
+      }
+    }
+
+    if (!fpsCause) {
+      fpsCause = await FpsCause.create({ causeList, whyList });
+      await fps.update({ causeId: fpsCause.id });
+    }
+
+    res.status(201).json({
+      status: "success",
+      message: "Cause created or updated successfully.",
+      data: {
+        fpsId: fps.fpsId,
+        cause: fpsCause,
+      },
+    });
+  }
+);
+
+// @desc    Create or update the defensive actions part in FPS
+// @route   POST /fps/defensive-actions
+// @access  Private
+export const createOrUpdateFpsDefensiveActions = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { procedure, userCategory, userService, quand } = req.body;
+    const { id: fpsId } = req.params;
+    const fps = await Fps.findOne({ where: { fpsId } });
+    if (!fps) {
+      return next(
+        new ApiError("FPS record not found for the provided fpsId.", 404)
+      );
+    }
+
+    let fpsDefensiveAction;
+    if (fps.defensiveActionsId) {
+      fpsDefensiveAction = await FpsDefensiveAction.findByPk(
+        fps.defensiveActionsId
+      );
+      if (fpsDefensiveAction) {
+        await fpsDefensiveAction.update({
+          procedure,
+          userCategory,
+          userService,
+          quand,
+        });
+      }
+    }
+
+    if (!fpsDefensiveAction) {
+      fpsDefensiveAction = await FpsDefensiveAction.create({
+        procedure,
+        userCategory,
+        userService,
+        quand,
+      });
+      await fps.update({ defensiveActionsId: fpsDefensiveAction.id });
+    }
+
+    res.status(201).json({
+      status: "success",
+      message: "Defensive actions created or updated successfully.",
+      data: {
+        fpsId: fps.fpsId,
+        defensiveActions: fpsDefensiveAction,
+      },
+    });
+  }
+);
