@@ -32,7 +32,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
     let fps = await Fps.findOne({ where: { fpsId } });
     let fpsProblem;
     if (!fps) {
-      const fpsProblem = await FpsProblem.create({
+      fpsProblem = await FpsProblem.create({
         type,
         quoi,
         ref,
@@ -68,7 +68,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
         });
       }
       if (!fpsProblem) {
-        const fpsProblem = await FpsProblem.create({
+        fpsProblem = await FpsProblem.create({
           type,
           quoi,
           ref,
