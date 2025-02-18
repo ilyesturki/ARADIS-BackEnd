@@ -30,7 +30,7 @@ class FpsProblem extends Model {
   )
   type!: string;
 
-  @Column(DataType.DATE)
+  @Column(DataType.STRING)
   quoi!: string;
 
   @Column(DataType.STRING)

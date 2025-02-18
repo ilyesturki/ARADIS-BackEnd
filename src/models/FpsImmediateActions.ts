@@ -22,20 +22,20 @@ export class FpsImmediateActions extends Model {
   @Column(DataType.INTEGER)
   id!: number;
 
-  // Change this to JSONB for more structured data storage
+  // Change this to JSON for MySQL compatibility
   @Column(DataType.JSON)
   alert?: string[]; // Example structure, customize as needed
 
   @Column(DataType.BOOLEAN)
   startSorting?: boolean;
 
-  @Column(DataType.JSONB)
+  @Column(DataType.JSON) // Changed from JSONB to JSON
   sortingResults?: SortingResultsType[];
 
   @Column(DataType.STRING)
   concludeFromSorting?: string;
 
-  @Column(DataType.JSONB)
+  @Column(DataType.JSON) // Changed from JSONB to JSON
   immediatActions?: ImmediatActionsType[];
 }
 
