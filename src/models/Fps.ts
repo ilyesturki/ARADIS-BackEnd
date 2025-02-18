@@ -9,16 +9,16 @@ import {
   BelongsTo,
 } from "sequelize-typescript";
 import { FpsType } from "../types/FpsType";
-import { FpsProblem } from "./FpsProblem";
-import { FpsDefensiveAction } from "./FpsDefensiveAction";
-import { FpsImmediateActions } from "./FpsImmediateActions";
-import { FpsCause } from "./FpsCause";
+import FpsProblem from "./FpsProblem";
+import FpsDefensiveAction from "./FpsDefensiveAction";
+import FpsImmediateActions from "./FpsImmediateActions";
+import FpsCause from "./FpsCause";
 
 @Table({
   tableName: "fps",
   timestamps: true,
 })
-class Fps extends Model{
+class Fps extends Model {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
