@@ -12,7 +12,7 @@ import { FpsImmediateActionsType } from "../types/FpsImmediateActionsType";
   tableName: "fps_immediate_actions",
   timestamps: true,
 })
-export class FpsImmediateActions extends Model<FpsImmediateActionsType> {
+export class FpsImmediateActions extends Model{
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)

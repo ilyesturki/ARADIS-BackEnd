@@ -12,7 +12,7 @@ import { FpsCauseType } from "../types/FpsCauseType";
   tableName: "fps_causes",
   timestamps: true,
 })
-export class FpsCause extends Model<FpsCauseType> {
+export class FpsCause extends Model{
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)

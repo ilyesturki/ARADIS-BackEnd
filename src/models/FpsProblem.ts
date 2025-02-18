@@ -12,7 +12,7 @@ import { FpsProblemType } from "../types/FpsProblemType";
   tableName: "fps_problems",
   timestamps: true,
 })
-class FpsProblem extends Model<FpsProblemType> {
+class FpsProblem extends Model {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
