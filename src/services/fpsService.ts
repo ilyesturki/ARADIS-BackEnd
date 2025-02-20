@@ -307,10 +307,21 @@ export const getFpsByFpsId = asyncHandler(
       );
     }
 
+    const transformedFps = {
+      fpsId: fps.fpsId,
+      currentStep: fps.currentStep,
+      problem: fps.problem,
+      immediatActions: fps.immediatActions,
+      cause: fps.cause,
+      defensiveActions: fps.defensiveActions?.map(
+        ({ id, fpsId, ...rest }) => rest
+      ),
+    };
+
     // Respond with the FPS data
     res.status(200).json({
       status: "success",
-      data: fps,
+      data: transformedFps,
     });
   }
 );
