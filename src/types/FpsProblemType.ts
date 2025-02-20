@@ -11,5 +11,5 @@ export type FpsProblemType = {
   pourquoi: string;
   image?: string;
   images?: string[];
-  clientRisck: boolean;
+  clientRisk: boolean;
 };

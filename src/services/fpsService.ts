@@ -25,7 +25,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
       pourquoi,
       image,
       images,
-      clientRisck,
+      clientRisk,
     } = req.body;
     const { id: fpsId } = req.params;
 
@@ -45,7 +45,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
         pourquoi,
         image,
         images,
-        clientRisck,
+        clientRisk,
       });
       fps = await Fps.create({
         fpsId,
@@ -68,7 +68,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
           pourquoi,
           image,
           images,
-          clientRisck,
+          clientRisk,
         });
       }
       if (!fpsProblem) {
@@ -85,7 +85,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
           pourquoi,
           image,
           images,
-          clientRisck,
+          clientRisk,
         });
         await fps.update({ problemId: fpsProblem.id });
       }
