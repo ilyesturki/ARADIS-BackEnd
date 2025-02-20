@@ -47,7 +47,11 @@ export const createOrUpdateFpsProblem = asyncHandler(
         images,
         clientRisck,
       });
-      fps = await Fps.create({ fpsId, problemId: fpsProblem.id });
+      fps = await Fps.create({
+        fpsId,
+        problemId: fpsProblem.id,
+        currentStep: "problem",
+      });
     } else {
       fpsProblem = await FpsProblem.findByPk(fps.problemId);
       if (fpsProblem) {
@@ -85,6 +89,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
         });
         await fps.update({ problemId: fpsProblem.id });
       }
+      await fps.update({ currentStep: "problem" });
     }
 
     res.status(201).json({
@@ -142,7 +147,12 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
         concludeFromSorting,
         immediatActions,
       });
-      await fps.update({ immediatActionsId: fpsImmediateActions.id });
+      await fps.update({
+        immediatActionsId: fpsImmediateActions.id,
+        currentStep: "immediateActions",
+      });
+    } else {
+      await fps.update({ currentStep: "immediateActions" }); // Update the currentStep
     }
 
     // Step 5: Respond with the FPS immediate actions data
@@ -181,7 +191,9 @@ export const createOrUpdateFpsCause = asyncHandler(
 
     if (!fpsCause) {
       fpsCause = await FpsCause.create({ causeList, whyList });
-      await fps.update({ causeId: fpsCause.id });
+      await fps.update({ causeId: fpsCause.id, currentStep: "cause" });
+    } else {
+      await fps.update({ currentStep: "cause" }); // Update the currentStep
     }
 
     res.status(201).json({
@@ -257,6 +269,7 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
         });
       })
     );
+    await fps.update({ currentStep: "defensiveActions" });
 
     res.status(201).json({
       status: "success",
@@ -265,6 +278,39 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
         fpsId: fps.fpsId,
         defensiveActions: updatedDefensiveActions,
       },
+    });
+  }
+);
+
+// @desc    Get FPS by fpsId
+// @route   GET /fps/:fpsId
+// @access  Private
+export const getFpsByFpsId = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id: fpsId } = req.params;
+
+    // Find the FPS record
+    const fps = await Fps.findOne({
+      where: { fpsId },
+      include: [
+        { model: FpsProblem, as: "problem" },
+        { model: FpsImmediateActions, as: "immediatActions" },
+        { model: FpsCause, as: "cause" },
+        { model: FpsDefensiveAction, as: "defensiveActions" },
+      ],
+    });
+
+    // If FPS record is not found, throw an error
+    if (!fps) {
+      return next(
+        new ApiError("FPS record not found for the provided fpsId.", 404)
+      );
+    }
+
+    // Respond with the FPS data
+    res.status(200).json({
+      status: "success",
+      data: fps,
     });
   }
 );

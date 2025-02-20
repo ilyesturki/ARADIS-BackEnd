@@ -51,6 +51,18 @@ class Fps extends Model {
 
   @HasMany(() => FpsDefensiveAction)
   defensiveActions!: FpsDefensiveAction[];
+
+  @Column({
+    type: DataType.ENUM(
+      "problem",
+      "immediateActions",
+      "cause",
+      "defensiveActions"
+    ),
+    allowNull: false,
+    defaultValue: "problem", // Default to the first step
+  })
+  currentStep!: "problem" | "immediateActions" | "cause" | "defensiveActions";
 }
 
 export default Fps;

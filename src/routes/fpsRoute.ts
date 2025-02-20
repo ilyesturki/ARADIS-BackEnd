@@ -11,6 +11,7 @@ import {
   createOrUpdateFpsImmediateActions,
   createOrUpdateFpsCause,
   createOrUpdateFpsDefensiveActions,
+  getFpsByFpsId,
 } from "../services/fpsService";
 import { protect, allowedTo } from "../services/authService";
 import {
@@ -66,6 +67,15 @@ router.route("/defensive-actions/:id").post(
     next();
   },
   createOrUpdateFpsDefensiveActions
+);
+
+router.route("/:id").get(
+  protect,
+  (req, res, next) => {
+    console.log(req.params);
+    next();
+  },
+  getFpsByFpsId
 );
 
 export default router;
