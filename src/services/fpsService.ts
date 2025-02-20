@@ -87,9 +87,8 @@ export const createOrUpdateFpsProblem = asyncHandler(
           images,
           clientRisk,
         });
-        await fps.update({ problemId: fpsProblem.id });
+        await fps.update({ problemId: fpsProblem.id, currentStep: "problem" });
       }
-      await fps.update({ currentStep: "problem" });
     }
 
     res.status(201).json({
