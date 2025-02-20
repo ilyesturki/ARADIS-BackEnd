@@ -7,6 +7,7 @@ import {
   AutoIncrement,
   ForeignKey,
   BelongsTo,
+  HasMany,
 } from "sequelize-typescript";
 import { FpsType } from "../types/FpsType";
 import FpsProblem from "./FpsProblem";
@@ -31,10 +32,6 @@ class Fps extends Model {
   @Column(DataType.INTEGER)
   problemId!: number;
 
-  @ForeignKey(() => FpsDefensiveAction)
-  @Column(DataType.INTEGER)
-  defensiveActionsId?: number;
-
   @ForeignKey(() => FpsCause)
   @Column(DataType.INTEGER)
   causeId?: number;
@@ -46,14 +43,14 @@ class Fps extends Model {
   @BelongsTo(() => FpsProblem)
   problem!: FpsProblem;
 
-  @BelongsTo(() => FpsDefensiveAction)
-  defensiveActions?: FpsDefensiveAction;
-
   @BelongsTo(() => FpsCause)
   cause?: FpsCause;
 
   @BelongsTo(() => FpsImmediateActions)
   immediatActions?: FpsImmediateActions;
+
+  @HasMany(() => FpsDefensiveAction)
+  defensiveActions!: FpsDefensiveAction[];
 }
 
 export default Fps;

@@ -198,9 +198,10 @@ export const createOrUpdateFpsCause = asyncHandler(
 // @desc    Create or update the defensive actions part in FPS
 // @route   POST /fps/defensive-actions
 // @access  Private
+
 export const createOrUpdateFpsDefensiveActions = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { procedure, userCategory, userService, quand } = req.body;
+    const { defensiveActions } = req.body;
     const { id: fpsId } = req.params;
     const fps = await Fps.findOne({ where: { fpsId } });
     if (!fps) {
@@ -209,37 +210,59 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
       );
     }
 
-    let fpsDefensiveAction;
-    if (fps.defensiveActionsId) {
-      fpsDefensiveAction = await FpsDefensiveAction.findByPk(
-        fps.defensiveActionsId
-      );
-      if (fpsDefensiveAction) {
-        await fpsDefensiveAction.update({
+    if (!Array.isArray(defensiveActions)) {
+      return next(new ApiError("Defensive actions must be an array.", 400));
+    }
+
+    // Fetch existing defensive actions linked to this FPS
+    const existingActions = await FpsDefensiveAction.findAll({
+      where: { fpsId: fps.id },
+    });
+
+    const existingIds = new Set(existingActions.map((action) => action.id));
+    const receivedIds = new Set(
+      defensiveActions.map((action) => action.id).filter(Boolean)
+    );
+
+    // Delete actions that are no longer in the request
+    const actionsToDelete = existingActions.filter(
+      (action) => !receivedIds.has(action.id)
+    );
+    await Promise.all(actionsToDelete.map((action) => action.destroy()));
+
+    // Create or update defensive actions
+    const updatedDefensiveActions = await Promise.all(
+      defensiveActions.map(async (action) => {
+        const { id, procedure, userCategory, userService, quand } = action;
+
+        if (id && existingIds.has(id)) {
+          const existingAction = await FpsDefensiveAction.findByPk(id);
+          if (existingAction) {
+            return await existingAction.update({
+              procedure,
+              userCategory,
+              userService,
+              quand,
+            });
+          }
+        }
+
+        return await FpsDefensiveAction.create({
           procedure,
           userCategory,
           userService,
           quand,
+          fpsId: fps.id,
         });
-      }
-    }
-
-    if (!fpsDefensiveAction) {
-      fpsDefensiveAction = await FpsDefensiveAction.create({
-        procedure,
-        userCategory,
-        userService,
-        quand,
-      });
-      await fps.update({ defensiveActionsId: fpsDefensiveAction.id });
-    }
+      })
+    );
 
     res.status(201).json({
       status: "success",
-      message: "Defensive actions created or updated successfully.",
+      message: "Defensive actions created, updated, or deleted successfully.",
       data: {
         fpsId: fps.fpsId,
-        defensiveActions: fpsDefensiveAction,
+        defensiveActions: updatedDefensiveActions,
       },
     });
   }

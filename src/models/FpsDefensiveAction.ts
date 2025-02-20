@@ -5,18 +5,28 @@ import {
   DataType,
   PrimaryKey,
   AutoIncrement,
+  ForeignKey,
+  BelongsTo,
 } from "sequelize-typescript";
 import { FpsDefensiveActionType } from "../types/FpsDefensiveActionType";
+import Fps from "./Fps";
 
 @Table({
   tableName: "fps_defensive_actions",
   timestamps: true,
 })
-class FpsDefensiveAction extends Model{
+class FpsDefensiveAction extends Model {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
   id!: number;
+
+  @ForeignKey(() => Fps)
+  @Column(DataType.INTEGER)
+  fpsId!: number;
+
+  @BelongsTo(() => Fps)
+  fps!: Fps;
 
   @Column(DataType.STRING)
   procedure!: string;
