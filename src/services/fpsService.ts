@@ -29,6 +29,9 @@ export const createOrUpdateFpsProblem = asyncHandler(
     } = req.body;
     const { id: fpsId } = req.params;
 
+    const newImage = images ? image : null;
+    const newImages = images ? images : null;
+
     let fps = await Fps.findOne({ where: { fpsId } });
     let fpsProblem;
     if (!fps) {
@@ -43,8 +46,8 @@ export const createOrUpdateFpsProblem = asyncHandler(
         comment,
         combien,
         pourquoi,
-        image,
-        images,
+        image: newImage,
+        images: newImages,
         clientRisk,
       });
       fps = await Fps.create({
@@ -66,8 +69,8 @@ export const createOrUpdateFpsProblem = asyncHandler(
           comment,
           combien,
           pourquoi,
-          image,
-          images,
+          image: newImage,
+          images: newImages,
           clientRisk,
         });
       }
@@ -83,8 +86,8 @@ export const createOrUpdateFpsProblem = asyncHandler(
           comment,
           combien,
           pourquoi,
-          image,
-          images,
+          image: newImage,
+          images: newImages,
           clientRisk,
         });
         await fps.update({ problemId: fpsProblem.id, currentStep: "problem" });
