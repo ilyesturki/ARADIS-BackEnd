@@ -8,7 +8,7 @@ export type FpsProblemType = {
   userService: string;
   comment: string;
   combien: string;
-  pourqoui: string;
+  pourquoi: string;
   image?: string;
   images?: string[];
   clientRisck: boolean;
