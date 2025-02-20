@@ -209,8 +209,9 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
         new ApiError("FPS record not found for the provided fpsId.", 404)
       );
     }
+    const defensiveActionsArr = JSON.parse(defensiveActions);
 
-    if (!Array.isArray(defensiveActions)) {
+    if (!Array.isArray(defensiveActionsArr)) {
       return next(new ApiError("Defensive actions must be an array.", 400));
     }
 
@@ -221,7 +222,7 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
 
     const existingIds = new Set(existingActions.map((action) => action.id));
     const receivedIds = new Set(
-      defensiveActions.map((action) => action.id).filter(Boolean)
+      defensiveActionsArr.map((action) => action.id).filter(Boolean)
     );
 
     // Delete actions that are no longer in the request
@@ -232,7 +233,7 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
 
     // Create or update defensive actions
     const updatedDefensiveActions = await Promise.all(
-      defensiveActions.map(async (action) => {
+      defensiveActionsArr.map(async (action) => {
         const { id, procedure, userCategory, userService, quand } = action;
 
         if (id && existingIds.has(id)) {
