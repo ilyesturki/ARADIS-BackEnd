@@ -29,7 +29,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
     } = req.body;
     const { id: fpsId } = req.params;
 
-    const newImage = images ? image : null;
+    const newImage = image ? image : null;
     const newImages = images ? images : null;
 
     let fps = await Fps.findOne({ where: { fpsId } });
