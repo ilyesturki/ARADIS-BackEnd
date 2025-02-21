@@ -120,7 +120,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
 //       startSorting,
 //       sortingResults,
 //       concludeFromSorting,
-//       immediatActions,
+//       immediateActions,
 //     } = req.body;
 //     const { id: fpsId } = req.params;
 //     const fps = await Fps.findOne({ where: { fpsId } });
@@ -141,7 +141,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
 //           startSorting,
 //           sortingResults,
 //           concludeFromSorting,
-//           immediatActions,
+//           immediateActions,
 //         });
 //       }
 //     }
@@ -152,7 +152,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
 //         startSorting,
 //         sortingResults,
 //         concludeFromSorting,
-//         immediatActions,
+//         immediateActions,
 //       });
 //       await fps.update({
 //         immediatActionsId: fpsImmediateActions.id,
@@ -179,7 +179,7 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
       startSorting,
       sortingResults,
       concludeFromSorting,
-      immediatActions,
+      immediateActions,
     } = req.body;
     const { id: fpsId } = req.params;
 
@@ -218,9 +218,9 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
       );
     }
 
-    if (immediatActions?.length) {
+    if (immediateActions?.length) {
       await ImmediateActions.bulkCreate(
-        immediatActions.map((action: string) => ({
+        immediateActions.map((action: string) => ({
           immediateActionsId: fpsImmediateActions.id,
           action,
         }))
@@ -415,7 +415,7 @@ export const getFpsByFpsId = asyncHandler(
       fpsId: fps.fpsId,
       currentStep: fps.currentStep,
       problem: fps.problem,
-      immediatActions: fps.immediatActions,
+      immediateActions: fps.immediateActions,
       cause: fps.cause,
       defensiveActions: fps.defensiveActions?.map(
         ({ id, fpsId, ...rest }) => rest
@@ -457,7 +457,7 @@ export const getAllFpsForUser = asyncHandler(
       fpsId: fps.fpsId,
       currentStep: fps.currentStep,
       problem: fps.problem,
-      immediatActions: fps.immediatActions,
+      immediateActions: fps.immediateActions,
       cause: fps.cause,
       defensiveActions: fps.defensiveActions?.map(
         ({ id, fpsId, ...rest }) => rest

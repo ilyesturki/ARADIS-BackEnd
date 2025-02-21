@@ -55,7 +55,7 @@ class Fps extends Model {
   cause?: FpsCause;
 
   @BelongsTo(() => FpsImmediateActions)
-  immediatActions?: FpsImmediateActions;
+  immediateActions?: FpsImmediateActions;
 
   @HasMany(() => FpsDefensiveAction)
   defensiveActions!: FpsDefensiveAction[];

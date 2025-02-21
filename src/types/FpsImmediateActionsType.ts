@@ -17,5 +17,5 @@ export type FpsImmediateActionsType = {
   startSorting?: boolean;
   sortingResults?: SortingResultsType[];
   concludeFromSorting?: string;
-  immediatActions?: ImmediatActionsType[];
+  immediateActions?: ImmediatActionsType[];
 };

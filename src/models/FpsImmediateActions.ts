@@ -37,7 +37,7 @@ export class FpsImmediateActions extends Model {
   sortingResults!: FpsSortingResult[];
 
   @HasMany(() => FpsImmediateAction)
-  immediatActions!: FpsImmediateAction[];
+  immediateActions!: FpsImmediateAction[];
 
   @BelongsTo(() => Fps)
   fps!: Fps;
