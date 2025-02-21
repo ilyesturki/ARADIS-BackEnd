@@ -14,6 +14,7 @@ import FpsProblem from "./FpsProblem";
 import FpsDefensiveAction from "./FpsDefensiveAction";
 import FpsImmediateActions from "./FpsImmediateActions";
 import FpsCause from "./FpsCause";
+import User from "./User";
 
 @Table({
   tableName: "fps",
@@ -27,6 +28,13 @@ class Fps extends Model {
 
   @Column(DataType.STRING)
   fpsId!: string;
+
+  @ForeignKey(() => User)
+  @Column(DataType.INTEGER)
+  userId!: number; // Each FPS belongs to a specific user
+
+  @BelongsTo(() => User)
+  user!: User; // Relationship with User
 
   @ForeignKey(() => FpsProblem)
   @Column(DataType.INTEGER)

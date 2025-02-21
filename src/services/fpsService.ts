@@ -28,6 +28,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
       clientRisk,
     } = req.body;
     const { id: fpsId } = req.params;
+    const userId = req.user?.id;
 
     const newImage = image ? image : null;
     const newImages = images ? images : null;
@@ -54,6 +55,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
         fpsId,
         problemId: fpsProblem.id,
         currentStep: "problem",
+        userId,
       });
     } else {
       fpsProblem = await FpsProblem.findByPk(fps.problemId);
@@ -290,6 +292,7 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
 export const getFpsByFpsId = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id: fpsId } = req.params;
+    const userId = req.user?.id;
 
     // Find the FPS record
     const fps = await Fps.findOne({
@@ -308,6 +311,12 @@ export const getFpsByFpsId = asyncHandler(
         new ApiError("FPS record not found for the provided fpsId.", 404)
       );
     }
+    // Check if the user has access to the FPS record
+    if (fps.userId !== userId) {
+      return next(
+        new ApiError("You do not have access to this FPS record.", 403)
+      );
+    }
 
     const transformedFps = {
       fpsId: fps.fpsId,
@@ -324,6 +333,44 @@ export const getFpsByFpsId = asyncHandler(
     res.status(200).json({
       status: "success",
       data: transformedFps,
+    });
+  }
+);
+
+// @desc    Get all FPS records for the logged-in user
+// @route   GET /fps
+// @access  Private
+export const getAllFpsForUser = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?.id;
+
+    // Fetch all FPS records for the logged-in user
+    const fpsRecords = await Fps.findAll({
+      where: { userId },
+      include: [
+        { model: FpsProblem, as: "problem" },
+        { model: FpsImmediateActions, as: "immediatActions" },
+        { model: FpsCause, as: "cause" },
+        { model: FpsDefensiveAction, as: "defensiveActions" },
+      ],
+    });
+
+    // Transform the FPS records
+    const transformedFpsRecords = fpsRecords.map((fps) => ({
+      fpsId: fps.fpsId,
+      currentStep: fps.currentStep,
+      problem: fps.problem,
+      immediatActions: fps.immediatActions,
+      cause: fps.cause,
+      defensiveActions: fps.defensiveActions?.map(
+        ({ id, fpsId, ...rest }) => rest
+      ),
+    }));
+
+    // Respond with the FPS data
+    res.status(200).json({
+      status: "success",
+      data: transformedFpsRecords,
     });
   }
 );

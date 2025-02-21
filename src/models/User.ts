@@ -9,8 +9,10 @@ import {
   PrimaryKey,
   AutoIncrement,
   BeforeSave,
+  HasMany,
 } from "sequelize-typescript";
 import bcrypt from "bcrypt";
+import Fps from "./Fps";
 
 /**
  * User Model
@@ -122,6 +124,9 @@ class User extends Model {
       instance.image = "https://via.placeholder.com/150";
     }
   }
+
+  @HasMany(() => Fps)
+  fpsRecords!: Fps[];
 }
 
 // TypeScript Interface for User
