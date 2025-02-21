@@ -5,12 +5,13 @@ import {
   DataType,
   PrimaryKey,
   AutoIncrement,
+  ForeignKey,
+  HasMany,
+  BelongsTo,
 } from "sequelize-typescript";
-import {
-  FpsImmediateActionsType,
-  ImmediatActionsType,
-  SortingResultsType,
-} from "../types/FpsImmediateActionsType";
+import Fps from "./Fps";
+import FpsSortingResult from "./SortingResults";
+import FpsImmediateAction from "./ImmediateActions";
 
 @Table({
   tableName: "fps_immediate_actions",
@@ -22,21 +23,24 @@ export class FpsImmediateActions extends Model {
   @Column(DataType.INTEGER)
   id!: number;
 
-  // Change this to JSON for MySQL compatibility
-  @Column(DataType.JSON)
-  alert?: string[]; // Example structure, customize as needed
-
   @Column(DataType.BOOLEAN)
   startSorting?: boolean;
-
-  @Column(DataType.JSON) // Changed from JSONB to JSON
-  sortingResults?: SortingResultsType[];
 
   @Column(DataType.STRING)
   concludeFromSorting?: string;
 
-  @Column(DataType.JSON) // Changed from JSONB to JSON
-  immediatActions?: ImmediatActionsType[];
+  @ForeignKey(() => Fps)
+  @Column(DataType.INTEGER)
+  fpsId!: number;
+
+  @HasMany(() => FpsSortingResult)
+  sortingResults!: FpsSortingResult[];
+
+  @HasMany(() => FpsImmediateAction)
+  immediatActions!: FpsImmediateAction[];
+
+  @BelongsTo(() => Fps)
+  fps!: Fps;
 }
 
 export default FpsImmediateActions;

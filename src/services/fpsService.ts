@@ -6,6 +6,8 @@ import FpsDefensiveAction from "../models/FpsDefensiveAction";
 import asyncHandler from "express-async-handler";
 import { Request, Response, NextFunction } from "express";
 import ApiError from "../utils/ApiError";
+import SortingResults from "../models/SortingResults";
+import ImmediateActions from "../models/ImmediateActions";
 
 // @desc    Create or update the problem part in FPS
 // @route   POST /fps/problem
@@ -110,16 +112,76 @@ export const createOrUpdateFpsProblem = asyncHandler(
 // @desc    Create or update the immediate actions part in FPS
 // @route   POST /fps/immediate-actions
 // @access  Private
+// export const createOrUpdateFpsImmediateActions = asyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const {
+//       alert,
+//       startSorting,
+//       sortingResults,
+//       concludeFromSorting,
+//       immediatActions,
+//     } = req.body;
+//     const { id: fpsId } = req.params;
+//     const fps = await Fps.findOne({ where: { fpsId } });
+//     if (!fps) {
+//       return next(
+//         new ApiError("FPS record not found for the provided fpsId.", 404)
+//       );
+//     }
+
+//     let fpsImmediateActions;
+//     if (fps.immediatActionsId) {
+//       fpsImmediateActions = await FpsImmediateActions.findByPk(
+//         fps.immediatActionsId
+//       );
+//       if (fpsImmediateActions) {
+//         await fpsImmediateActions.update({
+//           alert,
+//           startSorting,
+//           sortingResults,
+//           concludeFromSorting,
+//           immediatActions,
+//         });
+//       }
+//     }
+
+//     if (!fpsImmediateActions) {
+//       fpsImmediateActions = await FpsImmediateActions.create({
+//         alert,
+//         startSorting,
+//         sortingResults,
+//         concludeFromSorting,
+//         immediatActions,
+//       });
+//       await fps.update({
+//         immediatActionsId: fpsImmediateActions.id,
+//         currentStep: "immediateActions",
+//       });
+//     } else {
+//       await fps.update({ currentStep: "immediateActions" }); // Update the currentStep
+//     }
+
+//     // Step 5: Respond with the FPS immediate actions data
+//     res.status(201).json({
+//       status: "success",
+//       message: "Immediate actions created or updated successfully.",
+//       data: {
+//         fpsId: fps.fpsId,
+//         immediateActions: fpsImmediateActions,
+//       },
+//     });
+//   }
+// );
 export const createOrUpdateFpsImmediateActions = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const {
-      alert,
       startSorting,
       sortingResults,
       concludeFromSorting,
       immediatActions,
     } = req.body;
     const { id: fpsId } = req.params;
+
     const fps = await Fps.findOne({ where: { fpsId } });
     if (!fps) {
       return next(
@@ -127,46 +189,49 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
       );
     }
 
-    let fpsImmediateActions;
-    if (fps.immediatActionsId) {
-      fpsImmediateActions = await FpsImmediateActions.findByPk(
-        fps.immediatActionsId
-      );
-      if (fpsImmediateActions) {
-        await fpsImmediateActions.update({
-          alert,
-          startSorting,
-          sortingResults,
-          concludeFromSorting,
-          immediatActions,
-        });
-      }
-    }
-
-    if (!fpsImmediateActions) {
-      fpsImmediateActions = await FpsImmediateActions.create({
-        alert,
-        startSorting,
-        sortingResults,
-        concludeFromSorting,
-        immediatActions,
+    let fpsImmediateActions = await FpsImmediateActions.findOne({
+      where: { fpsId },
+    });
+    if (fpsImmediateActions) {
+      await fpsImmediateActions.update({ startSorting, concludeFromSorting });
+      await SortingResults.destroy({
+        where: { immediateActionsId: fpsImmediateActions.id },
       });
-      await fps.update({
-        immediatActionsId: fpsImmediateActions.id,
-        currentStep: "immediateActions",
+      await ImmediateActions.destroy({
+        where: { immediateActionsId: fpsImmediateActions.id },
       });
     } else {
-      await fps.update({ currentStep: "immediateActions" }); // Update the currentStep
+      fpsImmediateActions = await FpsImmediateActions.create({
+        fpsId,
+        startSorting,
+        concludeFromSorting,
+      });
     }
 
-    // Step 5: Respond with the FPS immediate actions data
+    if (sortingResults?.length) {
+      await SortingResults.bulkCreate(
+        sortingResults.map((result: string) => ({
+          immediateActionsId: fpsImmediateActions.id,
+          result,
+        }))
+      );
+    }
+
+    if (immediatActions?.length) {
+      await ImmediateActions.bulkCreate(
+        immediatActions.map((action: string) => ({
+          immediateActionsId: fpsImmediateActions.id,
+          action,
+        }))
+      );
+    }
+
+    await fps.update({ currentStep: "immediateActions" });
+
     res.status(201).json({
       status: "success",
       message: "Immediate actions created or updated successfully.",
-      data: {
-        fpsId: fps.fpsId,
-        immediateActions: fpsImmediateActions,
-      },
+      data: { fpsId: fps.fpsId, immediateActions: fpsImmediateActions },
     });
   }
 );

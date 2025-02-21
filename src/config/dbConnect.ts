@@ -5,6 +5,8 @@ import FpsProblem from "../models/FpsProblem";
 import FpsImmediateActions from "../models/FpsImmediateActions";
 import FpsCause from "../models/FpsCause";
 import FpsDefensiveAction from "../models/FpsDefensiveAction";
+import ImmediateActions from "../models/ImmediateActions";
+import SortingResults from "../models/SortingResults";
 
 const dbConnect = () => {
   const sequelize = new Sequelize({
@@ -20,6 +22,8 @@ const dbConnect = () => {
       FpsImmediateActions,
       FpsCause,
       FpsDefensiveAction,
+      ImmediateActions,
+      SortingResults,
     ], // Direct reference to models
     logging: false,
   });
