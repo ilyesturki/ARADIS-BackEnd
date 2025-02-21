@@ -2,7 +2,7 @@ import path from "path";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import dbConnect from "./config/dbConnect";
+import { sequelize, dbConnect } from "./config/dbConnect";
 import globalError from "./middlewares/globalError";
 import ApiError from "./utils/ApiError";
 import authRoute from "./routes/authRoute";
@@ -23,26 +23,25 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 const app = express();
 
 // Initialize Sequelize
-const sequelize = dbConnect();
-sequelize.addModels([
-  User,
-  Fps,
-  FpsProblem,
-  FpsImmediateActions,
-  FpsCause,
-  FpsDefensiveAction,
-  ImmediateActions,
-  SortingResults,
-]);
+// const sequelize = dbConnect();
+// sequelize.addModels([
+//   User,
+//   Fps,
+//   FpsProblem,
+//   FpsImmediateActions,
+//   FpsCause,
+//   FpsDefensiveAction,
+//   ImmediateActions,
+//   SortingResults,
+// ]);
 
 (async () => {
   try {
-    // Test the database connection
-    await sequelize.authenticate();
-    console.log("✅ Database connection established successfully.");
+    await dbConnect(); // Ensure the connection is established
+    console.log("✅ Database connected successfully.");
 
-    // ⚠️ Do NOT use `alter: true` to avoid index duplication issues.
-    await sequelize.sync(); // Only sync models without altering
+    // ⚠️ Avoid `alter: true` in production to prevent index duplication issues
+    await sequelize.sync();
     console.log("✅ All models synchronized successfully.");
   } catch (error) {
     console.error("❌ Unable to connect to the database:", error);
