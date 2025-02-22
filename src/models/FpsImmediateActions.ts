@@ -30,8 +30,8 @@ export class FpsImmediateActions extends Model {
   concludeFromSorting?: string;
 
   @ForeignKey(() => Fps)
-  @Column(DataType.INTEGER)
-  fpsId!: number;
+  @Column(DataType.STRING)
+  fpsId!: string;
 
   @HasMany(() => FpsSortingResult)
   sortingResults!: FpsSortingResult[];

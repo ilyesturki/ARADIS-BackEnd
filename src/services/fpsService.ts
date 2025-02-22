@@ -191,7 +191,7 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
     }
 
     let fpsImmediateActions = await FpsImmediateActions.findOne({
-      where: { fpsId },
+      where: { id: fps.id },
     });
     if (fpsImmediateActions) {
       await fpsImmediateActions.update({ startSorting, concludeFromSorting });

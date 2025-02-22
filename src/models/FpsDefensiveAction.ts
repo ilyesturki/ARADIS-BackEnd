@@ -22,8 +22,8 @@ class FpsDefensiveAction extends Model {
   id!: number;
 
   @ForeignKey(() => Fps)
-  @Column(DataType.INTEGER)
-  fpsId!: number;
+  @Column(DataType.STRING)
+  fpsId!: string;
 
   @BelongsTo(() => Fps)
   fps!: Fps;
