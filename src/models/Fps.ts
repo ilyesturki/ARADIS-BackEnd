@@ -8,6 +8,8 @@ import {
   ForeignKey,
   BelongsTo,
   HasMany,
+  Unique,
+  BeforeCreate,
 } from "sequelize-typescript";
 import { FpsType } from "../types/FpsType";
 import FpsProblem from "./FpsProblem";
@@ -15,6 +17,7 @@ import FpsDefensiveAction from "./FpsDefensiveAction";
 import FpsImmediateActions from "./FpsImmediateActions";
 import FpsCause from "./FpsCause";
 import User from "./User";
+import { generateFPSId } from "../utils/generateFPSId";
 
 @Table({
   tableName: "fps",
@@ -22,12 +25,16 @@ import User from "./User";
 })
 class Fps extends Model {
   @PrimaryKey
-  @AutoIncrement
-  @Column(DataType.INTEGER)
-  id!: number;
-
+  @Unique // Ensure uniqueness
   @Column(DataType.STRING)
   fpsId!: string;
+
+  @BeforeCreate
+  static generateFpsId(instance: Fps) {
+    if (!instance.fpsId) {
+      instance.fpsId = generateFPSId("FPS", 8); // Example: FPS-a1b2c3
+    }
+  }
 
   @ForeignKey(() => User)
   @Column(DataType.INTEGER)

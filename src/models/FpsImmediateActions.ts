@@ -30,7 +30,7 @@ export class FpsImmediateActions extends Model {
   concludeFromSorting?: string;
 
   @ForeignKey(() => Fps)
-  @Column(DataType.STRING)
+  @Column(DataType.STRING) // ✅ Should match Fps.fpsId type
   fpsId!: string;
 
   @HasMany(() => FpsSortingResult)

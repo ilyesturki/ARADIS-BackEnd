@@ -22,7 +22,7 @@ class FpsDefensiveAction extends Model {
   id!: number;
 
   @ForeignKey(() => Fps)
-  @Column(DataType.STRING)
+  @Column(DataType.STRING) // ✅ Should match Fps.fpsId type
   fpsId!: string;
 
   @BelongsTo(() => Fps)
