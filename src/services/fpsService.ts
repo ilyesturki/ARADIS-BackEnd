@@ -192,7 +192,7 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
     }
 
     let fpsImmediateActions = await FpsImmediateActions.findOne({
-      where: { id: fps.id },
+      where: { id: fps.fpsId },
     });
     if (fpsImmediateActions) {
       await fpsImmediateActions.update({ startSorting, concludeFromSorting });
@@ -311,7 +311,7 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
     try {
       // Get existing actions linked to this FPS
       const existingActions = await FpsDefensiveAction.findAll({
-        where: { fpsId: fps.id },
+        where: { fpsId: fps.fpsId },
         transaction,
       });
 
@@ -337,7 +337,7 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
             userCategory,
             userService,
             quand,
-            fpsId: fps.id,
+            fpsId: fps.fpsId,
           })
         ),
         {
