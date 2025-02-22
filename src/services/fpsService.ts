@@ -8,7 +8,8 @@ import { Request, Response, NextFunction } from "express";
 import ApiError from "../utils/ApiError";
 import SortingResults from "../models/SortingResults";
 import ImmediateActions from "../models/ImmediateActions";
-import { sequelize } from "../config/dbConnect";
+import dbConnect from "../config/dbConnect";
+const sequelize = dbConnect();
 
 // @desc    Create or update the problem part in FPS
 // @route   POST /fps/problem
