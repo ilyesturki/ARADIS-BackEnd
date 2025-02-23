@@ -23,6 +23,15 @@ export class ImmediateActions extends Model {
   @Column(DataType.STRING)
   action!: string;
 
+  @Column(DataType.STRING)
+  description!: string;
+
+  @Column(DataType.STRING)
+  userCategory!: string;
+
+  @Column(DataType.STRING)
+  userService!: string;
+
   @ForeignKey(() => FpsImmediateActions)
   @Column(DataType.INTEGER)
   immediateActionsId!: number;

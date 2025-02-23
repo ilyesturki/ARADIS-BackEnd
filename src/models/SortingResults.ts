@@ -21,7 +21,19 @@ export class SortingResults extends Model {
   id!: number;
 
   @Column(DataType.STRING)
-  result!: string;
+  product!: string;
+
+  @Column(DataType.STRING)
+  sortedQuantity!: string;
+
+  @Column(DataType.STRING)
+  quantityNOK!: string;
+
+  @Column(DataType.STRING)
+  userCategory!: string;
+
+  @Column(DataType.STRING)
+  userService!: string;
 
   @ForeignKey(() => FpsImmediateActions)
   @Column(DataType.INTEGER)
