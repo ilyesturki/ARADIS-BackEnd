@@ -10,6 +10,7 @@ import {
   AutoIncrement,
   BeforeSave,
   HasMany,
+  Index,
 } from "sequelize-typescript";
 import bcrypt from "bcrypt";
 import Fps from "./Fps";
@@ -21,6 +22,16 @@ import Fps from "./Fps";
 @Table({
   tableName: "users",
   timestamps: true, // Automatically adds createdAt and updatedAt fields
+  indexes: [
+    {
+      unique: true,
+      fields: ["mat"],
+    },
+    {
+      unique: true,
+      fields: ["email"],
+    },
+  ],
 })
 class User extends Model {
   // User ID (Auto-incremented Primary Key)
@@ -30,11 +41,9 @@ class User extends Model {
   id!: number;
 
   // Matricule (Unique Identifier)
-  @Unique
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
+  @AllowNull(false)
+  @Index({ unique: true })
+  @Column(DataType.STRING)
   mat!: string;
 
   // First Name
@@ -47,9 +56,9 @@ class User extends Model {
   @Column(DataType.STRING)
   lastName!: string;
 
-  // Email (Unique and Case-Insensitive)
-  @Unique
+  // Email (Unique, Case-Insensitive)
   @AllowNull(false)
+  @Index({ unique: true })
   @Column({
     type: DataType.STRING,
     validate: { isEmail: true },
