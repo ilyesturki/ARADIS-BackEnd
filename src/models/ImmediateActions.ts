@@ -20,8 +20,6 @@ export class ImmediateActions extends Model {
   @Column(DataType.INTEGER)
   id!: number;
 
-  @Column(DataType.STRING)
-  action!: string;
 
   @Column(DataType.STRING)
   description!: string;
