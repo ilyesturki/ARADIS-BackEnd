@@ -210,18 +210,20 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
       });
     }
 
-    if (sortingResults?.length) {
+    const sortingResultsArr = JSON.parse(sortingResults);
+    if (sortingResultsArr?.length) {
       await SortingResults.bulkCreate(
-        sortingResults.map((result: string) => ({
+        sortingResultsArr.map((result: string) => ({
           immediateActionsId: fpsImmediateActions.id,
           result,
         }))
       );
     }
 
-    if (immediateActions?.length) {
+    const immediateActionsArr = JSON.parse(immediateActions);
+    if (immediateActionsArr?.length) {
       await ImmediateActions.bulkCreate(
-        immediateActions.map((action: string) => ({
+        immediateActionsArr.map((action: string) => ({
           immediateActionsId: fpsImmediateActions.id,
           action,
         }))
