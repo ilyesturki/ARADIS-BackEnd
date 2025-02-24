@@ -9,6 +9,11 @@ import ApiError from "../utils/ApiError";
 import SortingResults from "../models/SortingResults";
 import ImmediateActions from "../models/ImmediateActions";
 import dbConnect from "../config/dbConnect";
+import {
+  ImmediatActionsType,
+  SortingResultsType,
+} from "../types/FpsImmediateActionsType";
+import { FpsDefensiveActionType } from "../types/FpsDefensiveActionType";
 const sequelize = dbConnect();
 
 // @desc    Create or update the problem part in FPS
@@ -499,9 +504,89 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
 // @desc    Get FPS by fpsId
 // @route   GET /fps/:fpsId
 // @access  Private
+// export const getFpsByFpsId = asyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const { id: fpsId } = req.params;
+//     const userId = req.user?.id;
+
+//     // Find the FPS record
+//     const fps = await Fps.findOne({
+//       where: { fpsId },
+//       include: [
+//         { model: FpsProblem, as: "problem" },
+//         {
+//           model: FpsImmediateActions,
+//           as: "immediateActions",
+//           include: [SortingResults, ImmediateActions],
+//         },
+//         { model: FpsCause, as: "cause" },
+//         { model: FpsDefensiveAction, as: "defensiveActions" },
+//       ],
+//     });
+
+//     // If FPS record is not found, throw an error
+//     if (!fps) {
+//       return next(
+//         new ApiError("FPS record not found for the provided fpsId.", 404)
+//       );
+//     }
+//     // Check if the user has access to the FPS record
+//     if (fps.userId !== userId) {
+//       return next(
+//         new ApiError("You do not have access to this FPS record.", 403)
+//       );
+//     }
+//     console.log("fps");
+//     console.log(fps);
+//     console.log("fps");
+//     const transformedFps = {
+//       fpsId: fps.fpsId,
+//       currentStep: fps.currentStep,
+//       problem: fps.problem,
+//       immediateActions: {
+//         ...fps.immediateActions,
+//         sortingResults: fps.immediateActions?.sortingResults?.map(
+//           ({
+//             product,
+//             quantityNOK,
+//             sortedQuantity,
+//             userCategory,
+//             userService,
+//           }) => {
+//             return {
+//               product,
+//               quantityNOK,
+//               sortedQuantity,
+//               userCategory,
+//               userService,
+//             };
+//           }
+//         ),
+//         immediateActions: fps.immediateActions?.immediateActions?.map(
+//           ({ description, userCategory, userService }) => {
+//             return { description, userCategory, userService };
+//           }
+//         ),
+//       },
+//       cause: fps.cause,
+//       defensiveActions: fps.defensiveActions?.map(
+//         ({ id, fpsId, ...rest }) => rest
+//       ),
+//     };
+
+//     // Respond with the FPS data
+//     res.status(200).json({
+//       status: "success",
+//       data: transformedFps,
+//     });
+//   }
+// );
+// @desc    Get FPS by fpsId
+// @route   GET /fps/:fpsId
+// @access  Private
 export const getFpsByFpsId = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { id: fpsId } = req.params;
+    const { fpsId } = req.params;
     const userId = req.user?.id;
 
     // Find the FPS record
@@ -525,48 +610,65 @@ export const getFpsByFpsId = asyncHandler(
         new ApiError("FPS record not found for the provided fpsId.", 404)
       );
     }
+
     // Check if the user has access to the FPS record
     if (fps.userId !== userId) {
       return next(
         new ApiError("You do not have access to this FPS record.", 403)
       );
     }
-    console.log("fps");
-    console.log(fps);
-    console.log("fps");
+
+    // Convert Sequelize object to plain JSON to avoid circular structure errors
+    const JSONFps = fps.toJSON();
+
+    // Transform the data to exclude IDs and timestamps
     const transformedFps = {
-      fpsId: fps.fpsId,
-      currentStep: fps.currentStep,
-      problem: fps.problem,
-      immediateActions: {
-        ...fps.immediateActions,
-        sortingResults: fps.immediateActions?.sortingResults?.map(
+      currentStep: JSONFps.currentStep,
+      problem: JSONFps.problem,
+      immediateActions: JSONFps.immediateActions
+        ? {
+            sortingResults:
+              JSONFps.immediateActions.sortingResults?.map(
+                ({
+                  product,
+                  quantityNOK,
+                  sortedQuantity,
+                  userCategory,
+                  userService,
+                }: SortingResultsType) => ({
+                  product,
+                  quantityNOK,
+                  sortedQuantity,
+                  userCategory,
+                  userService,
+                })
+              ) || [],
+            immediateActions:
+              JSONFps.immediateActions.immediateActions?.map(
+                ({
+                  description,
+                  userCategory,
+                  userService,
+                }: ImmediatActionsType) => ({
+                  description,
+                  userCategory,
+                  userService,
+                })
+              ) || [],
+          }
+        : null,
+      cause: JSONFps.cause,
+      defensiveActions:
+        JSONFps.defensiveActions?.map(
           ({
-            product,
-            quantityNOK,
-            sortedQuantity,
+            procedure,
             userCategory,
             userService,
-          }) => {
-            return {
-              product,
-              quantityNOK,
-              sortedQuantity,
-              userCategory,
-              userService,
-            };
+            quand,
+          }: FpsDefensiveActionType) => {
+            return { procedure, userCategory, userService, quand };
           }
-        ),
-        immediateActions: fps.immediateActions?.immediateActions?.map(
-          ({ description, userCategory, userService }) => {
-            return { description, userCategory, userService };
-          }
-        ),
-      },
-      cause: fps.cause,
-      defensiveActions: fps.defensiveActions?.map(
-        ({ id, fpsId, ...rest }) => rest
-      ),
+        ) || [],
     };
 
     // Respond with the FPS data
