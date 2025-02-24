@@ -538,7 +538,31 @@ export const getFpsByFpsId = asyncHandler(
       fpsId: fps.fpsId,
       currentStep: fps.currentStep,
       problem: fps.problem,
-      immediateActions: fps.immediateActions,
+      immediateActions: {
+        ...fps.immediateActions,
+        sortingResults: fps.immediateActions?.sortingResults?.map(
+          ({
+            product,
+            quantityNOK,
+            sortedQuantity,
+            userCategory,
+            userService,
+          }) => {
+            return {
+              product,
+              quantityNOK,
+              sortedQuantity,
+              userCategory,
+              userService,
+            };
+          }
+        ),
+        immediateActions: fps.immediateActions?.immediateActions?.map(
+          ({ description, userCategory, userService }) => {
+            return { description, userCategory, userService };
+          }
+        ),
+      },
       cause: fps.cause,
       defensiveActions: fps.defensiveActions?.map(
         ({ id, fpsId, ...rest }) => rest
