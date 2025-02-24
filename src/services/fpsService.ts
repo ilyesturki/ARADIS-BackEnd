@@ -243,6 +243,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
 export const createOrUpdateFpsImmediateActions = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const {
+      alert,
       startSorting,
       sortingResults,
       concludeFromSorting,
@@ -251,6 +252,8 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
     const { id: fpsId } = req.params;
 
     const transaction = await sequelize.transaction();
+
+    const alertArr = JSON.parse(alert);
     try {
       // Check if FPS exists
       const fps = await Fps.findOne({ where: { fpsId } });
@@ -265,7 +268,7 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
 
       if (fpsImmediateActions) {
         await fpsImmediateActions.update(
-          { startSorting, concludeFromSorting },
+          { alert: alertArr, startSorting, concludeFromSorting },
           { transaction }
         );
 
@@ -280,7 +283,7 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
         });
       } else {
         fpsImmediateActions = await FpsImmediateActions.create(
-          { startSorting, concludeFromSorting },
+          { alert: alertArr, startSorting, concludeFromSorting },
           { transaction }
         );
         await fps.update(
