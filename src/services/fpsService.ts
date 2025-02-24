@@ -586,7 +586,7 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
 // @access  Private
 export const getFpsByFpsId = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { fpsId } = req.params;
+    const { id: fpsId } = req.params;
     const userId = req.user?.id;
 
     // Find the FPS record
