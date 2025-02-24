@@ -343,7 +343,7 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
       res.status(201).json({
         status: "success",
         message: "Immediate actions created or updated successfully.",
-        data: { fpsId, immediateActions: fpsImmediateActions },
+        data: { fpsImmediateActions },
       });
     } catch (error) {
       await transaction.rollback();
@@ -525,7 +525,9 @@ export const getFpsByFpsId = asyncHandler(
         new ApiError("You do not have access to this FPS record.", 403)
       );
     }
-
+    console.log("fps");
+    console.log(fps);
+    console.log("fps");
     const transformedFps = {
       fpsId: fps.fpsId,
       currentStep: fps.currentStep,

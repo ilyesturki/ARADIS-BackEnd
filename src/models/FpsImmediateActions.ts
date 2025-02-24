@@ -29,18 +29,11 @@ export class FpsImmediateActions extends Model {
   @Column(DataType.STRING)
   concludeFromSorting?: string;
 
-  @ForeignKey(() => Fps)
-  @Column(DataType.STRING) // ✅ Should match Fps.fpsId type
-  fpsId!: string;
-
   @HasMany(() => FpsSortingResult)
   sortingResults!: FpsSortingResult[];
 
   @HasMany(() => FpsImmediateAction)
   immediateActions!: FpsImmediateAction[];
-
-  @BelongsTo(() => Fps)
-  fps!: Fps;
 }
 
 export default FpsImmediateActions;
