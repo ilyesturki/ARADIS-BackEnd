@@ -259,10 +259,9 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
       }
 
       // Find or create FPS Immediate Actions
-      let fpsImmediateActions = await FpsImmediateActions.findOne({
-        where: { fpsId },
-        transaction,
-      });
+      let fpsImmediateActions = await FpsImmediateActions.findByPk(
+        fps.immediatActionsId
+      );
 
       if (fpsImmediateActions) {
         await fpsImmediateActions.update(
@@ -281,7 +280,11 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
         });
       } else {
         fpsImmediateActions = await FpsImmediateActions.create(
-          { fpsId, startSorting, concludeFromSorting },
+          { startSorting, concludeFromSorting },
+          { transaction }
+        );
+        await fps.update(
+          { immediatActionsId: fpsImmediateActions.id },
           { transaction }
         );
       }
