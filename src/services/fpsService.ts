@@ -407,6 +407,99 @@ export const createOrUpdateFpsCause = asyncHandler(
 // @route   POST /fps/defensive-actions
 // @access  Private
 
+// export const createOrUpdateFpsDefensiveActions = asyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const { id: fpsId } = req.params;
+//     let defensiveActionsArr;
+
+//     try {
+//       defensiveActionsArr = JSON.parse(req.body.defensiveActions);
+//     } catch (error) {
+//       return next(
+//         new ApiError("Invalid JSON format in defensiveActions.", 400)
+//       );
+//     }
+
+//     if (!Array.isArray(defensiveActionsArr)) {
+//       return next(new ApiError("Defensive actions must be an array.", 400));
+//     }
+
+//     const fps = await Fps.findOne({ where: { fpsId } });
+//     if (!fps) {
+//       return next(
+//         new ApiError("FPS record not found for the provided fpsId.", 404)
+//       );
+//     }
+
+//     const transaction = await sequelize.transaction();
+
+//     try {
+//       // Get existing actions linked to this FPS
+//       const existingActions = await FpsDefensiveAction.findAll({
+//         where: { fpsId: fps.fpsId },
+//         transaction,
+//       });
+
+//       const existingIds = new Set(existingActions.map((action) => action.id));
+//       const receivedIds = new Set(
+//         defensiveActionsArr.map((action) => action.id).filter(Boolean)
+//       );
+
+//       // Bulk delete actions that are no longer in the request
+//       await FpsDefensiveAction.destroy({
+//         where: {
+//           id: Array.from(existingIds).filter((id) => !receivedIds.has(id)),
+//         },
+//         transaction,
+//       });
+
+//       // Bulk create or update defensive actions
+//       await FpsDefensiveAction.bulkCreate(
+//         defensiveActionsArr.map(
+//           ({ id, procedure, userCategory, userService, quand }) => ({
+//             id,
+//             procedure,
+//             userCategory,
+//             userService,
+//             quand,
+//             fpsId: fps.fpsId,
+//           })
+//         ),
+//         {
+//           updateOnDuplicate: [
+//             "procedure",
+//             "userCategory",
+//             "userService",
+//             "quand",
+//           ],
+//           transaction,
+//         }
+//       );
+
+//       // Update FPS current step
+//       await fps.update({ currentStep: "defensiveActions" }, { transaction });
+
+//       await transaction.commit();
+
+//       res.status(201).json({
+//         status: "success",
+//         message: "Defensive actions created, updated, or deleted successfully.",
+//         data: {
+//           fpsId: fps.fpsId,
+//           defensiveActions: defensiveActionsArr,
+//         },
+//       });
+//     } catch (error) {
+//       await transaction.rollback();
+//       next(
+//         new ApiError(
+//           "An error occurred while processing defensive actions.",
+//           500
+//         )
+//       );
+//     }
+//   }
+// );
 export const createOrUpdateFpsDefensiveActions = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id: fpsId } = req.params;
@@ -434,30 +527,16 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
     const transaction = await sequelize.transaction();
 
     try {
-      // Get existing actions linked to this FPS
-      const existingActions = await FpsDefensiveAction.findAll({
+      // Delete all existing defensive actions for this FPS
+      await FpsDefensiveAction.destroy({
         where: { fpsId: fps.fpsId },
         transaction,
       });
 
-      const existingIds = new Set(existingActions.map((action) => action.id));
-      const receivedIds = new Set(
-        defensiveActionsArr.map((action) => action.id).filter(Boolean)
-      );
-
-      // Bulk delete actions that are no longer in the request
-      await FpsDefensiveAction.destroy({
-        where: {
-          id: Array.from(existingIds).filter((id) => !receivedIds.has(id)),
-        },
-        transaction,
-      });
-
-      // Bulk create or update defensive actions
+      // Bulk insert new defensive actions
       await FpsDefensiveAction.bulkCreate(
         defensiveActionsArr.map(
-          ({ id, procedure, userCategory, userService, quand }) => ({
-            id,
+          ({ procedure, userCategory, userService, quand }) => ({
             procedure,
             userCategory,
             userService,
@@ -465,15 +544,7 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
             fpsId: fps.fpsId,
           })
         ),
-        {
-          updateOnDuplicate: [
-            "procedure",
-            "userCategory",
-            "userService",
-            "quand",
-          ],
-          transaction,
-        }
+        { transaction }
       );
 
       // Update FPS current step
@@ -483,7 +554,7 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
 
       res.status(201).json({
         status: "success",
-        message: "Defensive actions created, updated, or deleted successfully.",
+        message: "Defensive actions recreated successfully.",
         data: {
           fpsId: fps.fpsId,
           defensiveActions: defensiveActionsArr,
@@ -493,7 +564,7 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
       await transaction.rollback();
       next(
         new ApiError(
-          "An error occurred while processing defensive actions.",
+          "An error occurred while recreating defensive actions.",
           500
         )
       );
@@ -629,7 +700,7 @@ export const getFpsByFpsId = asyncHandler(
         ? {
             alert: JSONFps.immediateActions.alert,
             startSorting: JSONFps.immediateActions.startSorting,
-            concludeFromSorting: JSONFps.immediateActions.concludeFromSorting ,
+            concludeFromSorting: JSONFps.immediateActions.concludeFromSorting,
             sortingResults:
               JSONFps.immediateActions.sortingResults?.map(
                 ({
