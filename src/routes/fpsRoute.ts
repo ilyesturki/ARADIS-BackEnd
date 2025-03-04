@@ -13,6 +13,11 @@ import {
   createOrUpdateFpsDefensiveActions,
   getFpsByFpsId,
   getAllFpsForUser,
+  createFpsValidation,
+  createComment,
+  updateComment,
+  deleteComment,
+  getAllCommentByFps,
 } from "../services/fpsService";
 import { protect, allowedTo } from "../services/authService";
 import {
@@ -68,6 +73,66 @@ router.route("/defensive-actions/:id").post(
     next();
   },
   createOrUpdateFpsDefensiveActions
+);
+
+router.route("/validation/:id").post(
+  protect,
+  uploadFpsImages,
+  resizeFpsImages,
+  (req, res, next) => {
+    console.log(req.body);
+    console.log(req.params);
+    next();
+  },
+  createFpsValidation
+);
+
+router.route("/comments/:id").post(
+  protect,
+  uploadFpsImages,
+  resizeFpsImages,
+  (req, res, next) => {
+    console.log(req.body);
+    console.log(req.params);
+    next();
+  },
+  createComment
+);
+
+router.route("/comments/:id").put(
+  protect,
+  uploadFpsImages,
+  resizeFpsImages,
+  (req, res, next) => {
+    console.log(req.body);
+    console.log(req.params);
+    next();
+  },
+  updateComment
+);
+
+router.route("/comments/:id").delete(
+  protect,
+  uploadFpsImages,
+  resizeFpsImages,
+  (req, res, next) => {
+    console.log(req.body);
+    console.log(req.params);
+    next();
+  },
+  deleteComment
+);
+
+router.route("/comments/:id").get(
+  protect,
+  uploadFpsImages,
+  resizeFpsImages,
+  (req, res, next) => {
+    console.log(req.body);
+    console.log(req.params);
+    next();
+  },
+  getAllCommentByFps
 );
 
 router.route("/:id").get(

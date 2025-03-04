@@ -72,12 +72,25 @@ class Fps extends Model {
       "problem",
       "immediateActions",
       "cause",
-      "defensiveActions"
+      "defensiveActions",
+      "validation"
     ),
     allowNull: false,
     defaultValue: "problem", // Default to the first step
   })
-  currentStep!: "problem" | "immediateActions" | "cause" | "defensiveActions";
+  currentStep!:
+    | "problem"
+    | "immediateActions"
+    | "cause"
+    | "defensiveActions"
+    | "validation";
+
+  @Column({
+    type: DataType.ENUM("inProgress", "completed", "failed"),
+    allowNull: false,
+    defaultValue: "inProgress",
+  })
+  status!: "inProgress" | "completed" | "failed";
 }
 
 export default Fps;

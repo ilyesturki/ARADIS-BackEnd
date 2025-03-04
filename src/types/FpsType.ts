@@ -9,7 +9,12 @@ export interface FpsType {
   problemId?: number;
   causeId?: number;
   immediateActionsId?: number;
-  currentStep: "problem" | "immediateActions" | "cause" | "defensiveActions";
+  currentStep:
+    | "problem"
+    | "immediateActions"
+    | "cause"
+    | "defensiveActions"
+    | "validation";
   problem?: FpsProblemType;
   cause?: FpsCauseType;
   immediateActions?: FpsImmediateActionsType;

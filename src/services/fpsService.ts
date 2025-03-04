@@ -14,6 +14,7 @@ import {
   SortingResultsType,
 } from "../types/FpsImmediateActionsType";
 import { FpsDefensiveActionType } from "../types/FpsDefensiveActionType";
+import FpsComment from "../models/FpsComment";
 const sequelize = dbConnect();
 
 // @desc    Create or update the problem part in FPS
@@ -115,135 +116,6 @@ export const createOrUpdateFpsProblem = asyncHandler(
     });
   }
 );
-
-// @desc    Create or update the immediate actions part in FPS
-// @route   POST /fps/immediate-actions
-// @access  Private
-// export const createOrUpdateFpsImmediateActions = asyncHandler(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const {
-//       alert,
-//       startSorting,
-//       sortingResults,
-//       concludeFromSorting,
-//       immediateActions,
-//     } = req.body;
-//     const { id: fpsId } = req.params;
-//     const fps = await Fps.findOne({ where: { fpsId } });
-//     if (!fps) {
-//       return next(
-//         new ApiError("FPS record not found for the provided fpsId.", 404)
-//       );
-//     }
-
-//     let fpsImmediateActions;
-//     if (fps.immediatActionsId) {
-//       fpsImmediateActions = await FpsImmediateActions.findByPk(
-//         fps.immediatActionsId
-//       );
-//       if (fpsImmediateActions) {
-//         await fpsImmediateActions.update({
-//           alert,
-//           startSorting,
-//           sortingResults,
-//           concludeFromSorting,
-//           immediateActions,
-//         });
-//       }
-//     }
-
-//     if (!fpsImmediateActions) {
-//       fpsImmediateActions = await FpsImmediateActions.create({
-//         alert,
-//         startSorting,
-//         sortingResults,
-//         concludeFromSorting,
-//         immediateActions,
-//       });
-//       await fps.update({
-//         immediatActionsId: fpsImmediateActions.id,
-//         currentStep: "immediateActions",
-//       });
-//     } else {
-//       await fps.update({ currentStep: "immediateActions" }); // Update the currentStep
-//     }
-
-//     // Step 5: Respond with the FPS immediate actions data
-//     res.status(201).json({
-//       status: "success",
-//       message: "Immediate actions created or updated successfully.",
-//       data: {
-//         fpsId: fps.fpsId,
-//         immediateActions: fpsImmediateActions,
-//       },
-//     });
-//   }
-// );
-// export const createOrUpdateFpsImmediateActions = asyncHandler(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const {
-//       startSorting,
-//       sortingResults,
-//       concludeFromSorting,
-//       immediateActions,
-//     } = req.body;
-//     const { id: fpsId } = req.params;
-
-//     const fps = await Fps.findOne({ where: { fpsId } });
-//     if (!fps) {
-//       return next(
-//         new ApiError("FPS record not found for the provided fpsId.", 404)
-//       );
-//     }
-
-//     let fpsImmediateActions = await FpsImmediateActions.findOne({
-//       where: { id: fps.fpsId },
-//     });
-//     if (fpsImmediateActions) {
-//       await fpsImmediateActions.update({ startSorting, concludeFromSorting });
-//       await SortingResults.destroy({
-//         where: { immediateActionsId: fpsImmediateActions.id },
-//       });
-//       await ImmediateActions.destroy({
-//         where: { immediateActionsId: fpsImmediateActions.id },
-//       });
-//     } else {
-//       fpsImmediateActions = await FpsImmediateActions.create({
-//         fpsId,
-//         startSorting,
-//         concludeFromSorting,
-//       });
-//     }
-
-//     const sortingResultsArr = JSON.parse(sortingResults);
-//     if (sortingResultsArr?.length) {
-//       await SortingResults.bulkCreate(
-//         sortingResultsArr.map((result: string) => ({
-//           immediateActionsId: fpsImmediateActions.id,
-//           result,
-//         }))
-//       );
-//     }
-
-//     const immediateActionsArr = JSON.parse(immediateActions);
-//     if (immediateActionsArr?.length) {
-//       await ImmediateActions.bulkCreate(
-//         immediateActionsArr.map((action: string) => ({
-//           immediateActionsId: fpsImmediateActions.id,
-//           action,
-//         }))
-//       );
-//     }
-
-//     await fps.update({ currentStep: "immediateActions" });
-
-//     res.status(201).json({
-//       status: "success",
-//       message: "Immediate actions created or updated successfully.",
-//       data: { fpsId: fps.fpsId, immediateActions: fpsImmediateActions },
-//     });
-//   }
-// );
 
 export const createOrUpdateFpsImmediateActions = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -572,86 +444,112 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
   }
 );
 
-// @desc    Get FPS by fpsId
-// @route   GET /fps/:fpsId
+// @desc    Create or update the cause part in FPS
+// @route   POST /fps/cause
 // @access  Private
-// export const getFpsByFpsId = asyncHandler(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const { id: fpsId } = req.params;
-//     const userId = req.user?.id;
+export const createFpsValidation = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { status } = req.body;
+    const { id: fpsId } = req.params;
+    const fps = await Fps.findOne({ where: { fpsId } });
+    if (!fps) {
+      return next(
+        new ApiError("FPS record not found for the provided fpsId.", 404)
+      );
+    }
 
-//     // Find the FPS record
-//     const fps = await Fps.findOne({
-//       where: { fpsId },
-//       include: [
-//         { model: FpsProblem, as: "problem" },
-//         {
-//           model: FpsImmediateActions,
-//           as: "immediateActions",
-//           include: [SortingResults, ImmediateActions],
-//         },
-//         { model: FpsCause, as: "cause" },
-//         { model: FpsDefensiveAction, as: "defensiveActions" },
-//       ],
-//     });
+    await fps.update({ status, currentStep: "validation" });
 
-//     // If FPS record is not found, throw an error
-//     if (!fps) {
-//       return next(
-//         new ApiError("FPS record not found for the provided fpsId.", 404)
-//       );
-//     }
-//     // Check if the user has access to the FPS record
-//     if (fps.userId !== userId) {
-//       return next(
-//         new ApiError("You do not have access to this FPS record.", 403)
-//       );
-//     }
-//     console.log("fps");
-//     console.log(fps);
-//     console.log("fps");
-//     const transformedFps = {
-//       fpsId: fps.fpsId,
-//       currentStep: fps.currentStep,
-//       problem: fps.problem,
-//       immediateActions: {
-//         ...fps.immediateActions,
-//         sortingResults: fps.immediateActions?.sortingResults?.map(
-//           ({
-//             product,
-//             quantityNOK,
-//             sortedQuantity,
-//             userCategory,
-//             userService,
-//           }) => {
-//             return {
-//               product,
-//               quantityNOK,
-//               sortedQuantity,
-//               userCategory,
-//               userService,
-//             };
-//           }
-//         ),
-//         immediateActions: fps.immediateActions?.immediateActions?.map(
-//           ({ description, userCategory, userService }) => {
-//             return { description, userCategory, userService };
-//           }
-//         ),
-//       },
-//       cause: fps.cause,
-//       defensiveActions: fps.defensiveActions?.map(
-//         ({ id, fpsId, ...rest }) => rest
-//       ),
-//     };
+    res.status(201).json({
+      status: "success",
+      message: "Status updated successfully.",
+      data: {
+        fpsId: fps.fpsId,
+      },
+    });
+  }
+);
 
-//     // Respond with the FPS data
-//     res.status(200).json({
-//       status: "success",
-//       data: transformedFps,
-//     });
-//   }
-// );
+// Create a new comment
+export const createComment = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { userId, comment, date, rating } = req.body;
+    const { id: fpsId } = req.params;
+
+    const fps = await Fps.findOne({ where: { fpsId } });
+    if (!fps) {
+      return next(
+        new ApiError("FPS record not found for the provided fpsId.", 404)
+      );
+    }
+
+    const newComment = await FpsComment.create({
+      fpsId,
+      userId,
+      comment,
+      date,
+      rating,
+    });
+    res.status(201).json({
+      status: "success",
+      message: "Comment created successfully.",
+      data: newComment,
+    });
+  }
+);
+
+// Update an existing comment
+export const updateComment = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const { comment, rating } = req.body;
+    const commentToUpdate = await FpsComment.findByPk(id);
+    if (!commentToUpdate) {
+      return next(new ApiError("Comment not found", 404));
+    }
+    await commentToUpdate.update({ comment, rating });
+    res.status(200).json({
+      status: "success",
+      message: "Comment updated successfully.",
+      data: commentToUpdate,
+    });
+  }
+);
+
+// Delete a comment
+export const deleteComment = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const commentToDelete = await FpsComment.findByPk(id);
+    if (!commentToDelete) {
+      return next(new ApiError("Comment not found", 404));
+    }
+    await commentToDelete.destroy();
+    res.status(200).json({
+      status: "success",
+      message: "Comment deleted successfully.",
+    });
+  }
+);
+
+export const getAllCommentByFps = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id: fpsId } = req.params;
+    const fps = await Fps.findOne({ where: { fpsId } });
+    if (!fps) {
+      return next(
+        new ApiError("FPS record not found for the provided fpsId.", 404)
+      );
+    }
+    const comments = await FpsComment.findAll({ where: { fpsId } });
+    res.status(200).json({
+      status: "success",
+      message: "Comments fetched successfully.",
+      data: comments,
+    });
+  }
+);
+
 // @desc    Get FPS by fpsId
 // @route   GET /fps/:fpsId
 // @access  Private
