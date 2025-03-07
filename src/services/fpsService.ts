@@ -692,3 +692,40 @@ export const getAllFpsForUser = asyncHandler(
     });
   }
 );
+
+
+export const getAllFps = asyncHandler(
+  async (req: Request, res: Response) => {
+    
+    const fpsRecords = await Fps.findAll({
+      include: [
+        { model: FpsProblem, as: "problem" },
+        {
+          model: FpsImmediateActions,
+          as: "immediateActions",
+          include: [SortingResults, ImmediateActions],
+        },
+        { model: FpsCause, as: "cause" },
+        { model: FpsDefensiveAction, as: "defensiveActions" },
+      ],
+    });
+
+    // Transform the FPS records
+    const transformedFpsRecords = fpsRecords.map((fps) => ({
+      fpsId: fps.fpsId,
+      currentStep: fps.currentStep,
+      problem: fps.problem,
+      immediateActions: fps.immediateActions,
+      cause: fps.cause,
+      defensiveActions: fps.defensiveActions?.map(
+        ({ id, fpsId, ...rest }) => rest
+      ),
+    }));
+
+    // Respond with the FPS data
+    res.status(200).json({
+      status: "success",
+      data: transformedFpsRecords,
+    });
+  }
+);

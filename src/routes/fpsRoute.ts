@@ -18,6 +18,7 @@ import {
   updateComment,
   deleteComment,
   getAllCommentByFps,
+  getAllFps,
 } from "../services/fpsService";
 import { protect, allowedTo } from "../services/authService";
 import {
@@ -144,13 +145,22 @@ router.route("/:id").get(
   getFpsByFpsId
 );
 
-router.route("/").get(
+router.route("/me").get(
   protect,
   (req, res, next) => {
     console.log(req.params);
     next();
   },
   getAllFpsForUser
+);
+
+router.route("/").get(
+  protect,
+  (req, res, next) => {
+    console.log(req.params);
+    next();
+  },
+  getAllFps
 );
 
 export default router;
