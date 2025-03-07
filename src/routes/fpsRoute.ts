@@ -136,15 +136,6 @@ router.route("/comments/:id").get(
   getAllCommentByFps
 );
 
-router.route("/:id").get(
-  protect,
-  (req, res, next) => {
-    console.log(req.params);
-    next();
-  },
-  getFpsByFpsId
-);
-
 router.route("/me").get(
   protect,
   (req, res, next) => {
@@ -162,5 +153,15 @@ router.route("/").get(
   },
   getAllFps
 );
+
+router.route("/:id").get(
+  protect,
+  (req, res, next) => {
+    console.log(req.params);
+    next();
+  },
+  getFpsByFpsId
+);
+
 
 export default router;
