@@ -15,6 +15,7 @@ import {
 } from "../types/FpsImmediateActionsType";
 import { FpsDefensiveActionType } from "../types/FpsDefensiveActionType";
 import FpsComment from "../models/FpsComment";
+import User from "../models/User";
 const sequelize = dbConnect();
 
 // @desc    Create or update the problem part in FPS
@@ -541,7 +542,11 @@ export const getAllCommentByFps = asyncHandler(
         new ApiError("FPS record not found for the provided fpsId.", 404)
       );
     }
-    const comments = await FpsComment.findAll({ where: { fpsId } });
+    const comments = await FpsComment.findAll({
+      where: { fpsId },
+      include: [{ model: User, as: "user" }],
+    });
+
     res.status(200).json({
       status: "success",
       message: "Comments fetched successfully.",
