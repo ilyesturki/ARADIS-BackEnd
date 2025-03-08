@@ -515,10 +515,16 @@ export const updateComment = asyncHandler(
       return next(new ApiError("Comment not found", 404));
     }
     await commentToUpdate.update({ comment, rating });
+
+    const commentWithUser = await FpsComment.findOne({
+      where: { id: commentToUpdate.id },
+      include: [{ model: User, as: "user" }],
+    });
+
     res.status(200).json({
       status: "success",
       message: "Comment updated successfully.",
-      data: commentToUpdate,
+      data: commentWithUser,
     });
   }
 );
