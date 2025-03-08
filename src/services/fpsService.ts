@@ -541,6 +541,7 @@ export const deleteComment = asyncHandler(
     res.status(200).json({
       status: "success",
       message: "Comment deleted successfully.",
+      data: id,
     });
   }
 );
