@@ -99,7 +99,7 @@ router.route("/comments/:id").post(
   },
   createComment
 );
-
+// test
 router.route("/comments/:id").put(
   protect,
   uploadFpsImages,
@@ -162,6 +162,5 @@ router.route("/:id").get(
   },
   getFpsByFpsId
 );
-
 
 export default router;
