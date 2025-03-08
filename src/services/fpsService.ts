@@ -491,10 +491,16 @@ export const createComment = asyncHandler(
       date,
       rating,
     });
+
+    const commentWithUser = await FpsComment.findOne({
+      where: { id: newComment.id },
+      include: [{ model: User, as: "user" }],
+    });
+
     res.status(201).json({
       status: "success",
       message: "Comment created successfully.",
-      data: newComment,
+      data: commentWithUser,
     });
   }
 );
