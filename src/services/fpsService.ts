@@ -609,6 +609,7 @@ export const getFpsByFpsId = asyncHandler(
 
     // Transform the data to exclude IDs and timestamps
     const transformedFps = {
+      fpsId: JSONFps.fpsId,
       status: JSONFps.status,
       currentStep: JSONFps.currentStep,
       problem: JSONFps.problem,
