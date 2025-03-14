@@ -12,9 +12,28 @@ import activationEmailTemplate from "../utils/emailTemplate/activationEmailTempl
 // @access  Admin
 export const createUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { mat,firstName, lastName,role, email, phone,  image, } = req.body;
-   
-    console.log(mat, email, phone, firstName, lastName, image);
+    const {
+      mat,
+      firstName,
+      lastName,
+      role,
+      userCategory,
+      userService,
+      email,
+      phone,
+      image,
+    } = req.body;
+
+    console.log(
+      mat,
+      email,
+      phone,
+      firstName,
+      lastName,
+      image,
+      userCategory,
+      userService
+    );
     // Check if user already exists
     const existingUser = await User.findOne({ where: { mat: mat } });
 
@@ -32,6 +51,8 @@ export const createUser = asyncHandler(
       firstName,
       lastName,
       role,
+      userCategory,
+      userService,
       email,
       phone,
       status: "pending",
@@ -51,9 +72,9 @@ export const createUser = asyncHandler(
     });
 
     // Construct the activation link
-    // const activationUrl = `${process.env.FRONTEND_URL}/auth/activate?token=${activationToken}`;
-    const activationUrl = `https://9000-idx-aradis-frontend-1739358595337.cluster-4ezwrnmkojawstf2k7vqy36oe6.cloudworkstations.dev/auth/activate?token=${activationToken}`;
-    
+    const activationUrl = `${process.env.FRONTEND_URL}/auth/activate?token=${activationToken}`;
+    // const activationUrl = `https://9000-idx-aradis-frontend-1739358595337.cluster-4ezwrnmkojawstf2k7vqy36oe6.cloudworkstations.dev/auth/activate?token=${activationToken}`;
+
     // Send email
     try {
       await sendEmail(

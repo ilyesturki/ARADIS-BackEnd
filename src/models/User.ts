@@ -90,6 +90,12 @@ class User extends Model {
   })
   password?: string;
 
+  @Column(DataType.STRING)
+  userCategory!: string;
+
+  @Column(DataType.STRING)
+  userService!: string;
+
   // Role (user or admin)
   @Default("user")
   @AllowNull(false)
