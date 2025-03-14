@@ -36,6 +36,9 @@ class Fps extends Model {
     }
   }
 
+  @Column(DataType.STRING)
+  qrCodeUrl?: string;  // Column to store the QR code URL
+
   @ForeignKey(() => User)
   @Column(DataType.INTEGER)
   userId!: number; // Each FPS belongs to a specific user

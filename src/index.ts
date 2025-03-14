@@ -18,6 +18,7 @@ import FpsDefensiveAction from "./models/FpsDefensiveAction";
 import ImmediateActions from "./models/ImmediateActions";
 import SortingResults from "./models/SortingResults";
 import FpsComment from "./models/FpsComment";
+import FpsHelper from "./models/FpsHelper";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
@@ -35,6 +36,7 @@ sequelize.addModels([
   ImmediateActions,
   SortingResults,
   FpsComment,
+  FpsHelper
 ]);
 
 (async () => {
