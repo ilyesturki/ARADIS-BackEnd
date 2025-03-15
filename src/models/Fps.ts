@@ -10,6 +10,7 @@ import {
   HasMany,
   Unique,
   BeforeCreate,
+  BeforeUpdate,
 } from "sequelize-typescript";
 import { FpsType } from "../types/FpsType";
 import FpsProblem from "./FpsProblem";
@@ -94,6 +95,20 @@ class Fps extends Model {
     defaultValue: "inProgress",
   })
   status!: "inProgress" | "completed" | "failed";
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true, // The field is optional and will be set when closed
+  })
+  closeDate?: Date;
+
+  @BeforeUpdate
+  static setCloseDate(instance: Fps) {
+    if (instance.changed("status") && ["completed", "failed"].includes(instance.status)) {
+      instance.closeDate = new Date();
+    }
+  }
+  
 }
 
 export default Fps;
