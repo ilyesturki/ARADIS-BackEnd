@@ -90,7 +90,7 @@ export const getFpsQrCodeScanStatistics = asyncHandler(
     const transformedFps = {
       total: fpsHelpers.length,
       scanned: fpsHelpers.filter((fps) => fps.scanStatus === "scanned").length,
-      notScanned: fpsHelpers.filter((fps) => fps.scanStatus === "unscanned")
+      unScanned: fpsHelpers.filter((fps) => fps.scanStatus === "unscanned")
         .length,
     };
 
