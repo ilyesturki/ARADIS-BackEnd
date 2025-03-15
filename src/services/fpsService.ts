@@ -810,6 +810,7 @@ export const getFpsQrCode = asyncHandler(
     // Find the FPS record
     const fps = await Fps.findOne({
       where: { fpsId },
+      include: [{ model: FpsProblem, as: "problem" }],
     });
 
     // If FPS record is not found, throw an error
@@ -825,6 +826,7 @@ export const getFpsQrCode = asyncHandler(
     // Transform the data to exclude IDs and timestamps
     const transformedFps = {
       qrCodeUrl: JSONFps.qrCodeUrl,
+      image: JSONFps.problem.image,
     };
 
     // Respond with the FPS data
