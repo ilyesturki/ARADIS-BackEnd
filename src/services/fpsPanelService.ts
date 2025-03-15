@@ -24,14 +24,17 @@ export const getAllFpsQrCodeScanStatistics = asyncHandler(
       );
     }
 
-    const stats: Record<string, { scanned: number; unscanned: number }> = {};
+    const stats: Record<
+      string,
+      { month: string; scanned: number; unscanned: number }
+    > = {};
 
     fpsRecords.forEach((fps) => {
       if (!fps.closeDate) return; // Handle undefined closeDate safely
       const month = fps.closeDate.toISOString().slice(0, 7); // No more TS error!
 
       if (!stats[month]) {
-        stats[month] = { scanned: 0, unscanned: 0 };
+        stats[month] = { month, scanned: 0, unscanned: 0 };
       }
 
       fps.fpsHelper?.forEach((helper) => {
