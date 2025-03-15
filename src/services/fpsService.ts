@@ -803,3 +803,34 @@ export const getSelectedUsersForFps = asyncHandler(
     });
   }
 );
+
+export const getFpsQrCode = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id: fpsId } = req.params;
+    // Find the FPS record
+    const fps = await Fps.findOne({
+      where: { fpsId },
+    });
+
+    // If FPS record is not found, throw an error
+    if (!fps) {
+      return next(
+        new ApiError("FPS record not found for the provided fpsId.", 404)
+      );
+    }
+
+    // Convert Sequelize object to plain JSON to avoid circular structure errors
+    const JSONFps = fps.toJSON();
+
+    // Transform the data to exclude IDs and timestamps
+    const transformedFps = {
+      qrCodeUrl: JSONFps.qrCodeUrl,
+    };
+
+    // Respond with the FPS data
+    res.status(200).json({
+      status: "success",
+      data: transformedFps,
+    });
+  }
+);

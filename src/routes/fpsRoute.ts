@@ -20,6 +20,7 @@ import {
   getAllCommentByFps,
   getAllFps,
   getSelectedUsersForFps,
+  getFpsQrCode,
 } from "../services/fpsService";
 import { protect, allowedTo } from "../services/authService";
 import {
@@ -63,6 +64,18 @@ router.route("/selected-users/:id").get(
     next();
   },
   getSelectedUsersForFps
+);
+
+router.route("/qr-code/:id").get(
+  protect,
+  uploadFpsImages,
+  resizeFpsImages,
+  (req, res, next) => {
+    console.log(req.body);
+    console.log(req.params);
+    next();
+  },
+  getFpsQrCode
 );
 
 router.route("/cause/:id").post(
