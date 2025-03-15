@@ -14,14 +14,19 @@ import {
   getFpsByFpsId,
   getAllFpsForUser,
   createFpsValidation,
+  getAllFps,
+} from "../services/fpsService";
+import {
   createComment,
   updateComment,
   deleteComment,
   getAllCommentByFps,
-  getAllFps,
+} from "../services/fpsCommentService";
+import {
   getSelectedUsersForFps,
   getFpsQrCode,
-} from "../services/fpsService";
+  getFpsQrCodeScanStatistics,
+} from "../services/fpsPanelService";
 import { protect, allowedTo } from "../services/authService";
 import {
   resizeFpsImages,
@@ -76,6 +81,18 @@ router.route("/qr-code/:id").get(
     next();
   },
   getFpsQrCode
+);
+
+router.route("/qr-code-scan-statistics/:id").get(
+  protect,
+  uploadFpsImages,
+  resizeFpsImages,
+  (req, res, next) => {
+    console.log(req.body);
+    console.log(req.params);
+    next();
+  },
+  getFpsQrCodeScanStatistics
 );
 
 router.route("/cause/:id").post(
