@@ -11,20 +11,7 @@ import { RequestHandler } from "express";
 // LOGED USER ONLY
 export const updateLoggedUserValidator = [
   paramsSanitizer("id"),
-  bodySanitizer(
-    "name",
-    "email",
-    "phone",
-    "status",
-    "address.details",
-    "address.governorate",
-    "address.city",
-    "address.postalCode",
-    "image",
-    "emailProductsNotifications",
-    "emailSecurityNotifications",
-    "phoneSecurityNotifications"
-  ),
+  bodySanitizer("name", "email", "phone", "status", "image"),
   param("id").notEmpty().withMessage("id is required"),
   body("name")
     .optional()
@@ -106,6 +93,8 @@ export const createUserValidator = [
     "email",
     "phone",
     "role",
+    "userCategory",
+    "userService",
     "image"
   ),
   body("mat")
@@ -142,6 +131,22 @@ export const createUserValidator = [
     .optional()
     .isIn(["user", "admin"])
     .withMessage("role must be user or admin"),
+  body("userCategory")
+    .optional()
+    .isIn(["corporaite", "top-management", "midel-management", "operational"])
+    .withMessage("select a valid user category"),
+  body("userService")
+    .optional()
+    .isIn([
+      "productions",
+      "maintenance",
+      "logistique",
+      "qualité",
+      "ip",
+      "R&D",
+      "autre",
+    ])
+    .withMessage("select a valid user service"),
   body("image").optional().isString().withMessage("image must be a string"),
   validatorMiddleware,
 ];
@@ -154,6 +159,8 @@ export const updateUserValidator = [
     "email",
     "phone",
     "role",
+    "userCategory",
+    "userService",
     "image"
   ),
   param("id").notEmpty().withMessage("id is required"),
@@ -179,6 +186,22 @@ export const updateUserValidator = [
     .optional()
     .isIn(["user", "admin"])
     .withMessage("role must be user or admin"),
+  body("userCategory")
+    .optional()
+    .isIn(["corporaite", "top-management", "midel-management", "operational"])
+    .withMessage("select a valid user category"),
+  body("userService")
+    .optional()
+    .isIn([
+      "productions",
+      "maintenance",
+      "logistique",
+      "qualité",
+      "ip",
+      "R&D",
+      "autre",
+    ])
+    .withMessage("select a valid user service"),
   body("image").optional().isString().withMessage("image must be a string"),
 
   validatorMiddleware,

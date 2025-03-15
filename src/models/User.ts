@@ -90,10 +90,31 @@ class User extends Model {
   })
   password?: string;
 
-  @Column(DataType.STRING)
+  @Default("operational")
+  @AllowNull(false)
+  @Column(
+    DataType.ENUM(
+      "corporaite",
+      "top-management",
+      "midel-management",
+      "operational"
+    )
+  )
   userCategory!: string;
 
-  @Column(DataType.STRING)
+  @Default("autre")
+  @AllowNull(false)
+  @Column(
+    DataType.ENUM(
+      "productions",
+      "maintenance",
+      "logistique",
+      "qualité",
+      "ip",
+      "R&D",
+      "autre"
+    )
+  )
   userService!: string;
 
   // Role (user or admin)
