@@ -50,7 +50,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
     let fpsProblem;
     if (!fps) {
       // Generate the QR code and upload to Cloudinary
-      const qrCodeUrl = await createQRCode(fpsId);  // Save QR code URL from Cloudinary
+      const qrCodeUrl = await createQRCode(fpsId); // Save QR code URL from Cloudinary
 
       fpsProblem = await FpsProblem.create({
         type,
@@ -72,9 +72,8 @@ export const createOrUpdateFpsProblem = asyncHandler(
         problemId: fpsProblem.id,
         currentStep: "problem",
         userId,
-        qrCodeUrl,  // Save the QR code URL
+        qrCodeUrl, // Save the QR code URL
       });
-
     } else {
       fpsProblem = await FpsProblem.findByPk(fps.problemId);
       if (fpsProblem) {
@@ -114,7 +113,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
       }
       // Update FPS record (if the QR code hasn't been generated yet)
       if (!fps.qrCodeUrl) {
-        const qrCodeUrl = await createQRCode(fpsId);  // Generate QR code if it's not already saved
+        const qrCodeUrl = await createQRCode(fpsId); // Generate QR code if it's not already saved
         await fps.update({ qrCodeUrl });
       }
     }
@@ -152,20 +151,20 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
       }
 
       // Add helpers (users) based on the alert category
-    for (const category of alertArr) {
-      const usersInCategory = await User.findAll({
-        where: { category: category }, // Filter users by category
-      });
-
-      for (const user of usersInCategory) {
-        // Add each user as a helper for this FPS
-        await FpsHelper.create({
-          fpsId: fps.fpsId,
-          userId: user.id,
-          scanStatus: "notScanned", // Initial status
+      for (const category of alertArr) {
+        const usersInCategory = await User.findAll({
+          where: { userService: category, userCategory: "midel-management" }, // Filter users by category
         });
+
+        for (const user of usersInCategory) {
+          // Add each user as a helper for this FPS
+          await FpsHelper.create({
+            fpsId: fps.fpsId,
+            userId: user.id,
+            scanStatus: "notScanned", // Initial status
+          });
+        }
       }
-    }
 
       // Find or create FPS Immediate Actions
       let fpsImmediateActions = await FpsImmediateActions.findByPk(
