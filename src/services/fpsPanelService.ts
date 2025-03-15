@@ -6,6 +6,33 @@ import ApiError from "../utils/ApiError";
 import User from "../models/User";
 import FpsHelper from "../models/FpsHelper";
 
+export const getFpsStatusOverviewChartData = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // Find the FPS record
+    const fpsRecords = await Fps.findAll();
+
+    // If FPS record is not found, throw an error
+    if (!fpsRecords) {
+      return next(new ApiError("No FPS records found", 404));
+    }
+
+    // Transform the data to exclude IDs and timestamps
+    const transformedFps = {
+      total: fpsRecords.length,
+      inProgress: fpsRecords.filter((fps) => fps.status === "inProgress")
+        .length,
+      completed: fpsRecords.filter((fps) => fps.status === "completed").length,
+      failed: fpsRecords.filter((fps) => fps.status === "failed").length,
+    };
+
+    // Respond with the FPS data
+    res.status(200).json({
+      status: "success",
+      data: transformedFps,
+    });
+  }
+);
+
 export const getSelectedUsersForFps = asyncHandler(
   async (req: Request, res: Response) => {
     const { id: fpsId } = req.params;
