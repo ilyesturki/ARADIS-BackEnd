@@ -40,10 +40,10 @@ class FpsHelper extends Model {
   user!: User;
 
   @Column({
-    type: DataType.ENUM("notScanned", "scanned"),
-    defaultValue: "notScanned",
+    type: DataType.ENUM("unscanned", "scanned"),
+    defaultValue: "unscanned",
   })
-  scanStatus!: "notScanned" | "scanned";
+  scanStatus!: "unscanned" | "scanned";
 
   @CreatedAt
   createdAt!: Date;
