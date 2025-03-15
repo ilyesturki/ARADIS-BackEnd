@@ -9,6 +9,7 @@ import {
   Unique,
   CreatedAt,
   UpdatedAt,
+  AutoIncrement,
 } from "sequelize-typescript";
 import Fps from "./Fps";
 import User from "./User";
@@ -20,6 +21,7 @@ import User from "./User";
 class FpsHelper extends Model {
   @PrimaryKey
   @Unique
+  @AutoIncrement
   @Column(DataType.INTEGER)
   id!: number;
 
