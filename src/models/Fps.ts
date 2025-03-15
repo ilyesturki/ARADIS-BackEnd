@@ -19,6 +19,7 @@ import FpsImmediateActions from "./FpsImmediateActions";
 import FpsCause from "./FpsCause";
 import User from "./User";
 import { generateFPSId } from "../utils/generateFPSId";
+import FpsHelper from "./FpsHelper";
 
 @Table({
   tableName: "fps",
@@ -38,7 +39,7 @@ class Fps extends Model {
   }
 
   @Column(DataType.STRING)
-  qrCodeUrl?: string;  // Column to store the QR code URL
+  qrCodeUrl?: string; // Column to store the QR code URL
 
   @ForeignKey(() => User)
   @Column(DataType.INTEGER)
@@ -89,6 +90,9 @@ class Fps extends Model {
     | "defensiveActions"
     | "validation";
 
+  @HasMany(() => FpsHelper)
+  fpsHelper!: FpsHelper[];
+
   @Column({
     type: DataType.ENUM("inProgress", "completed", "failed"),
     allowNull: false,
@@ -104,11 +108,13 @@ class Fps extends Model {
 
   @BeforeUpdate
   static setCloseDate(instance: Fps) {
-    if (instance.changed("status") && ["completed", "failed"].includes(instance.status)) {
+    if (
+      instance.changed("status") &&
+      ["completed", "failed"].includes(instance.status)
+    ) {
       instance.closeDate = new Date();
     }
   }
-  
 }
 
 export default Fps;

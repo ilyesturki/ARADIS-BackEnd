@@ -6,6 +6,48 @@ import ApiError from "../utils/ApiError";
 import User from "../models/User";
 import FpsHelper from "../models/FpsHelper";
 
+import { Op } from "sequelize";
+
+export const getAllFpsQrCodeScanStatistics = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const fiveMonthsAgo = new Date();
+    fiveMonthsAgo.setMonth(fiveMonthsAgo.getMonth() - 5);
+
+    const fpsRecords = await Fps.findAll({
+      where: { closeDate: { [Op.gte]: fiveMonthsAgo } },
+      include: [{ model: FpsHelper, as: "fpsHelper" }], // Ensure FpsHelper is included
+    });
+
+    if (!fpsRecords.length) {
+      return next(
+        new ApiError("No FPS records found for the last 5 months.", 404)
+      );
+    }
+
+    const stats: Record<string, { scanned: number; unscanned: number }> = {};
+
+    fpsRecords.forEach((fps) => {
+      if (!fps.closeDate) return; // Handle undefined closeDate safely
+      const month = fps.closeDate.toISOString().slice(0, 7); // No more TS error!
+
+      if (!stats[month]) {
+        stats[month] = { scanned: 0, unscanned: 0 };
+      }
+
+      fps.fpsHelper?.forEach((helper) => {
+        // Use optional chaining
+        if (helper.scanStatus === "scanned") {
+          stats[month].scanned++;
+        } else {
+          stats[month].unscanned++;
+        }
+      });
+    });
+
+    res.status(200).json({ status: "success", data: stats });
+  }
+);
+
 export const getFpsStatusOverviewChartData = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     // Find the FPS record
