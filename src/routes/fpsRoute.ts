@@ -28,6 +28,7 @@ import {
   getFpsQrCodeScanStatistics,
   getFpsStatusOverviewChartData,
   getAllFpsQrCodeScanStatistics,
+  getCompletedFpsStats,
 } from "../services/fpsPanelService";
 import { protect, allowedTo } from "../services/authService";
 import {
@@ -83,6 +84,18 @@ router.route("/status-overview-chart").get(
     next();
   },
   getFpsStatusOverviewChartData
+);
+
+router.route("/completed-fps-chart").get(
+  protect,
+  uploadFpsImages,
+  resizeFpsImages,
+  (req, res, next) => {
+    console.log(req.body);
+    console.log(req.params);
+    next();
+  },
+  getCompletedFpsStats
 );
 
 router.route("/selected-users/:id").get(

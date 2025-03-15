@@ -7,7 +7,34 @@ import User from "../models/User";
 import FpsHelper from "../models/FpsHelper";
 
 import { Op } from "sequelize";
+import { format, subMonths } from "date-fns";
 
+export const getFpsStatusOverviewChartData = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // Find the FPS record
+    const fpsRecords = await Fps.findAll();
+
+    // If FPS record is not found, throw an error
+    if (!fpsRecords) {
+      return next(new ApiError("No FPS records found", 404));
+    }
+
+    // Transform the data to exclude IDs and timestamps
+    const transformedFps = {
+      total: fpsRecords.length,
+      inProgress: fpsRecords.filter((fps) => fps.status === "inProgress")
+        .length,
+      completed: fpsRecords.filter((fps) => fps.status === "completed").length,
+      failed: fpsRecords.filter((fps) => fps.status === "failed").length,
+    };
+
+    // Respond with the FPS data
+    res.status(200).json({
+      status: "success",
+      data: transformedFps,
+    });
+  }
+);
 export const getAllFpsQrCodeScanStatistics = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const fiveMonthsAgo = new Date();
@@ -52,30 +79,34 @@ export const getAllFpsQrCodeScanStatistics = asyncHandler(
   }
 );
 
-export const getFpsStatusOverviewChartData = asyncHandler(
+export const getCompletedFpsStats = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    // Find the FPS record
-    const fpsRecords = await Fps.findAll();
+    const sixMonthsAgo = subMonths(new Date(), 6);
 
-    // If FPS record is not found, throw an error
-    if (!fpsRecords) {
-      return next(new ApiError("No FPS records found", 404));
+    const fpsRecords = await Fps.findAll({
+      where: { closeDate: { [Op.gte]: sixMonthsAgo } },
+    });
+
+    if (!fpsRecords.length) {
+      return next(
+        new ApiError("No FPS records found for the last 6 months.", 404)
+      );
     }
 
-    // Transform the data to exclude IDs and timestamps
-    const transformedFps = {
-      total: fpsRecords.length,
-      inProgress: fpsRecords.filter((fps) => fps.status === "inProgress")
-        .length,
-      completed: fpsRecords.filter((fps) => fps.status === "completed").length,
-      failed: fpsRecords.filter((fps) => fps.status === "failed").length,
-    };
+    const stats: { [key: string]: { month: string; completedFPS: number } } =
+      {};
 
-    // Respond with the FPS data
-    res.status(200).json({
-      status: "success",
-      data: transformedFps,
+    fpsRecords.forEach((fps) => {
+      if (!fps.closeDate) return;
+      const month = format(fps.closeDate, "MMM"); // Example: "Jan", "Feb"
+
+      if (!stats[month]) {
+        stats[month] = { month, completedFPS: 0 };
+      }
+      stats[month].completedFPS++;
     });
+
+    res.status(200).json({ status: "success", data: Object.values(stats) });
   }
 );
 
