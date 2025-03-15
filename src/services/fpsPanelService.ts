@@ -15,7 +15,7 @@ export const getAllFpsQrCodeScanStatistics = asyncHandler(
 
     const fpsRecords = await Fps.findAll({
       where: { closeDate: { [Op.gte]: fiveMonthsAgo } },
-      include: [{ model: FpsHelper, as: "fpsHelper" }], // Ensure FpsHelper is included
+      include: [{ model: FpsHelper, as: "fpsHelper" }],
     });
 
     if (!fpsRecords.length) {
@@ -24,21 +24,19 @@ export const getAllFpsQrCodeScanStatistics = asyncHandler(
       );
     }
 
-    const stats: Record<
-      string,
-      { month: string; scanned: number; unscanned: number }
-    > = {};
+    const stats: {
+      [key: string]: { month: string; scanned: number; unscanned: number };
+    } = {};
 
     fpsRecords.forEach((fps) => {
-      if (!fps.closeDate) return; // Handle undefined closeDate safely
-      const month = fps.closeDate.toISOString().slice(0, 7); // No more TS error!
+      if (!fps.closeDate) return;
+      const month = fps.closeDate.toISOString().slice(0, 7);
 
       if (!stats[month]) {
         stats[month] = { month, scanned: 0, unscanned: 0 };
       }
 
       fps.fpsHelper?.forEach((helper) => {
-        // Use optional chaining
         if (helper.scanStatus === "scanned") {
           stats[month].scanned++;
         } else {
@@ -47,7 +45,10 @@ export const getAllFpsQrCodeScanStatistics = asyncHandler(
       });
     });
 
-    res.status(200).json({ status: "success", data: stats });
+    // Convert object to array to return a table-like format
+    const statsArray = Object.values(stats);
+
+    res.status(200).json({ status: "success", data: statsArray });
   }
 );
 
