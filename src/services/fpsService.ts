@@ -787,12 +787,12 @@ export const getSelectedUsersForFps = asyncHandler(
     console.log(fpsRecords);
     // Transform the FPS records
     const transformedSelectedUsersForFps = fpsRecords.map((fps) => ({
-      fpsId: fps.fpsId,
+      id: fps.id,
       email: fps.user.email,
       firstName: fps.user.firstName,
       lastName: fps.user.lastName,
       scanStatus: fps.scanStatus,
-      Image: fps.user.image,
+      image: fps.user.image,
     }));
     console.log(transformedSelectedUsersForFps);
 
