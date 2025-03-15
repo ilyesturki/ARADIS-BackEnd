@@ -19,6 +19,7 @@ import {
   deleteComment,
   getAllCommentByFps,
   getAllFps,
+  getSelectedUsersForFps,
 } from "../services/fpsService";
 import { protect, allowedTo } from "../services/authService";
 import {
@@ -50,6 +51,18 @@ router.route("/immediate-actions/:id").post(
     next();
   },
   createOrUpdateFpsImmediateActions
+);
+
+router.route("/selected-users/:id").get(
+  protect,
+  uploadFpsImages,
+  resizeFpsImages,
+  (req, res, next) => {
+    console.log(req.body);
+    console.log(req.params);
+    next();
+  },
+  getSelectedUsersForFps
 );
 
 router.route("/cause/:id").post(

@@ -771,3 +771,35 @@ export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
     data: transformedFpsRecords,
   });
 });
+
+export const getSelectedUsersForFps = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id: fpsId } = req.params;
+
+    // Fetch all FPS records for the logged-in user
+    const fpsRecords = await FpsHelper.findAll({
+      where: { fpsId },
+      include: [
+        { model: User, as: "user" },
+        { model: Fps, as: "fps" },
+      ],
+    });
+    console.log(fpsRecords);
+    // Transform the FPS records
+    const transformedSelectedUsersForFps = fpsRecords.map((fps) => ({
+      fpsId: fps.fpsId,
+      email: fps.user.email,
+      firstName: fps.user.firstName,
+      lastName: fps.user.lastName,
+      scanStatus: fps.scanStatus,
+      Image: fps.user.image,
+    }));
+    console.log(transformedSelectedUsersForFps);
+
+    // Respond with the FPS data
+    res.status(200).json({
+      status: "success",
+      data: transformedSelectedUsersForFps,
+    });
+  }
+);
