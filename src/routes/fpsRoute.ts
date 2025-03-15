@@ -29,6 +29,7 @@ import {
   getFpsStatusOverviewChartData,
   getAllFpsQrCodeScanStatistics,
   getCompletedFpsStats,
+  getFailedFpsStats,
 } from "../services/fpsPanelService";
 import { protect, allowedTo } from "../services/authService";
 import {
@@ -96,6 +97,18 @@ router.route("/completed-fps-chart").get(
     next();
   },
   getCompletedFpsStats
+);
+
+router.route("/failed-fps-chart").get(
+  protect,
+  uploadFpsImages,
+  resizeFpsImages,
+  (req, res, next) => {
+    console.log(req.body);
+    console.log(req.params);
+    next();
+  },
+  getFailedFpsStats
 );
 
 router.route("/selected-users/:id").get(
