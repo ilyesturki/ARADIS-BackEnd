@@ -161,7 +161,7 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
           await FpsHelper.create({
             fpsId: fps.fpsId,
             userId: user.id,
-            scanStatus: "notScanned", // Initial status
+            scanStatus: "unscanned", // Initial status
           });
         }
       }
@@ -675,5 +675,3 @@ export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
     data: transformedFpsRecords,
   });
 });
-
-
