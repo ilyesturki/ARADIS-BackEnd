@@ -104,9 +104,9 @@ export const getAllFpsQrCodeScanStatistics = asyncHandler(
       return date.toISOString().slice(0, 7);
     }).reverse();
 
-    // Fetch FPS records in the last 5 months based on `closeDate`
+    // Fetch FPS records created in the last 5 months (ignoring closeDate)
     const fpsRecords = await Fps.findAll({
-      where: { closeDate: { [Op.gte]: fiveMonthsAgo } },
+      where: { createdAt: { [Op.gte]: fiveMonthsAgo } },
       include: [{ model: FpsHelper, as: "fpsHelper" }],
     });
 
@@ -117,8 +117,7 @@ export const getAllFpsQrCodeScanStatistics = asyncHandler(
     > = {};
 
     fpsRecords.forEach((fps) => {
-      if (!fps.closeDate) return;
-      const monthKey = fps.closeDate.toISOString().slice(0, 7);
+      const monthKey = fps.createdAt.toISOString().slice(0, 7); // Group by createdAt month
 
       if (!statsMap[monthKey]) {
         statsMap[monthKey] = { month: monthKey, scanned: 0, unscanned: 0 };
