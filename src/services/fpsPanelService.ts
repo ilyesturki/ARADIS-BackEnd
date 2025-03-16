@@ -105,7 +105,7 @@ export const getAllFpsQrCodeScanStatistics = asyncHandler(
 
     // Step 2: Fetch FPS records in last 5 months
     const fpsRecords = await Fps.findAll({
-      where: { closeDate: { [Op.gte]: fiveMonthsAgo } },
+      where: { createdAt: { [Op.gte]: fiveMonthsAgo } },
       include: [{ model: FpsHelper, as: "fpsHelper" }],
     });
 
