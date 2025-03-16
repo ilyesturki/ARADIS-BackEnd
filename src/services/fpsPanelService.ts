@@ -92,27 +92,29 @@ export const getFpsStatusOverviewChartData = asyncHandler(
 export const getAllFpsQrCodeScanStatistics = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const today = new Date();
+    const fiveMonthsAgo = new Date(
+      today.getFullYear(),
+      today.getMonth() - 4,
+      1
+    );
 
-    // Step 1: Get the last 5 months in "YYYY-MM" format
+    // Generate last 5 months in "YYYY-MM" format
     const lastFiveMonths = Array.from({ length: 5 }, (_, i) => {
-      const date = new Date();
-      date.setMonth(today.getMonth() - i);
+      const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
       return date.toISOString().slice(0, 7);
-    }).reverse(); // Chronological order
+    }).reverse();
 
-    const fiveMonthsAgo = new Date();
-    fiveMonthsAgo.setMonth(today.getMonth() - 4); // Include current month too
-
-    // Step 2: Fetch FPS records in last 5 months
+    // Fetch FPS records in the last 5 months based on `closeDate`
     const fpsRecords = await Fps.findAll({
-      where: { createdAt: { [Op.gte]: fiveMonthsAgo } },
+      where: { closeDate: { [Op.gte]: fiveMonthsAgo } },
       include: [{ model: FpsHelper, as: "fpsHelper" }],
     });
 
-    // Step 3: Build stats object
-    const statsMap: {
-      [key: string]: { month: string; scanned: number; unscanned: number };
-    } = {};
+    // Define statistics map
+    const statsMap: Record<
+      string,
+      { month: string; scanned: number; unscanned: number }
+    > = {};
 
     fpsRecords.forEach((fps) => {
       if (!fps.closeDate) return;
@@ -122,13 +124,14 @@ export const getAllFpsQrCodeScanStatistics = asyncHandler(
         statsMap[monthKey] = { month: monthKey, scanned: 0, unscanned: 0 };
       }
 
-      fps.fpsHelper?.forEach((helper) => {
+      if (!fps.fpsHelper) return;
+      fps.fpsHelper.forEach((helper) => {
         if (helper.scanStatus === "scanned") statsMap[monthKey].scanned++;
         else statsMap[monthKey].unscanned++;
       });
     });
 
-    // Step 4: Ensure all last 5 months are present (fill missing months)
+    // Ensure all months are present in the response
     const statsArray = lastFiveMonths.map((month) => ({
       month,
       scanned: statsMap[month]?.scanned || 0,
@@ -138,6 +141,55 @@ export const getAllFpsQrCodeScanStatistics = asyncHandler(
     res.status(200).json({ status: "success", data: statsArray });
   }
 );
+// export const getAllFpsQrCodeScanStatistics = asyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const today = new Date();
+
+//     // Step 1: Get the last 5 months in "YYYY-MM" format
+//     const lastFiveMonths = Array.from({ length: 5 }, (_, i) => {
+//       const date = new Date();
+//       date.setMonth(today.getMonth() - i);
+//       return date.toISOString().slice(0, 7);
+//     }).reverse(); // Chronological order
+
+//     const fiveMonthsAgo = new Date();
+//     fiveMonthsAgo.setMonth(today.getMonth() - 4); // Include current month too
+
+//     // Step 2: Fetch FPS records in last 5 months
+//     const fpsRecords = await Fps.findAll({
+//       where: { createdAt: { [Op.gte]: fiveMonthsAgo } },
+//       include: [{ model: FpsHelper, as: "fpsHelper" }],
+//     });
+
+//     // Step 3: Build stats object
+//     const statsMap: {
+//       [key: string]: { month: string; scanned: number; unscanned: number };
+//     } = {};
+
+//     fpsRecords.forEach((fps) => {
+//       if (!fps.closeDate) return;
+//       const monthKey = fps.closeDate.toISOString().slice(0, 7);
+
+//       if (!statsMap[monthKey]) {
+//         statsMap[monthKey] = { month: monthKey, scanned: 0, unscanned: 0 };
+//       }
+
+//       fps.fpsHelper?.forEach((helper) => {
+//         if (helper.scanStatus === "scanned") statsMap[monthKey].scanned++;
+//         else statsMap[monthKey].unscanned++;
+//       });
+//     });
+
+//     // Step 4: Ensure all last 5 months are present (fill missing months)
+//     const statsArray = lastFiveMonths.map((month) => ({
+//       month,
+//       scanned: statsMap[month]?.scanned || 0,
+//       unscanned: statsMap[month]?.unscanned || 0,
+//     }));
+
+//     res.status(200).json({ status: "success", data: statsArray });
+//   }
+// );
 
 const getFpsStats = (status: "failed" | "completed") =>
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
