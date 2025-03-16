@@ -7,7 +7,49 @@ import User from "../models/User";
 import FpsHelper from "../models/FpsHelper";
 
 import { Op } from "sequelize";
-import { format, subMonths } from "date-fns";
+import { format, subDays, subMonths } from "date-fns";
+
+export const getFpsPerformanceStats = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { timeRange } = req.params;
+
+    const today = new Date();
+    let daysToSubtract = 90;
+    if (timeRange === "30d") daysToSubtract = 30;
+    else if (timeRange === "7d") daysToSubtract = 7;
+
+    const startDate = subDays(today, daysToSubtract);
+
+    const fpsRecords = await Fps.findAll({
+      where: {
+        createdAt: { [Op.gte]: startDate },
+      },
+    });
+
+    if (!fpsRecords.length) {
+      return next(new ApiError("No FPS records found.", 404));
+    }
+
+    const stats: {
+      [key: string]: { date: string; completed: number; failed: number };
+    } = {};
+
+    fpsRecords.forEach((fps) => {
+      const date = format(fps.createdAt, "yyyy-MM-dd");
+
+      if (!stats[date]) {
+        stats[date] = { date, completed: 0, failed: 0 };
+      }
+      if (fps.status === "completed") {
+        stats[date].completed++;
+      } else if (fps.status === "failed") {
+        stats[date].failed++;
+      }
+    });
+
+    res.status(200).json({ status: "success", data: Object.values(stats) });
+  }
+);
 
 export const getFpsStatusOverviewChartData = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {

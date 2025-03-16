@@ -30,6 +30,7 @@ import {
   getAllFpsQrCodeScanStatistics,
   getCompletedFpsStats,
   getFailedFpsStats,
+  getFpsPerformanceStats,
 } from "../services/fpsPanelService";
 import { protect, allowedTo } from "../services/authService";
 import {
@@ -61,6 +62,18 @@ router.route("/immediate-actions/:id").post(
     next();
   },
   createOrUpdateFpsImmediateActions
+);
+
+router.route("/performance-stats-chart/:timeRange").get(
+  protect,
+  uploadFpsImages,
+  resizeFpsImages,
+  (req, res, next) => {
+    console.log(req.body);
+    console.log(req.params);
+    next();
+  },
+  getFpsPerformanceStats
 );
 
 router.route("/all-qr-codes-scan-statistics").get(
