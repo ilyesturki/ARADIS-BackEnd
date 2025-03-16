@@ -63,49 +63,6 @@ export const getFpsPerformanceStats = asyncHandler(
   }
 );
 
-// export const getFpsPerformanceStats = asyncHandler(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const { timeRange } = req.params;
-
-//     const today = new Date();
-//     let daysToSubtract = 90;
-//     if (timeRange === "30d") daysToSubtract = 30;
-//     else if (timeRange === "7d") daysToSubtract = 7;
-
-//     const startDate = subDays(today, daysToSubtract);
-
-//     const fpsRecords = await Fps.findAll({
-//       where: {
-//         closeDate: { [Op.gte]: startDate },
-//       },
-//     });
-
-//     if (!fpsRecords.length) {
-//       return next(new ApiError("No FPS records found.", 404));
-//     }
-
-//     const stats: {
-//       [key: string]: { date: string; completed: number; failed: number };
-//     } = {};
-
-//     fpsRecords.forEach((fps) => {
-//       if (!fps.closeDate) return;
-//       const date = format(fps.closeDate, "yyyy-MM-dd");
-
-//       if (!stats[date]) {
-//         stats[date] = { date, completed: 0, failed: 0 };
-//       }
-//       if (fps.status === "completed") {
-//         stats[date].completed++;
-//       } else if (fps.status === "failed") {
-//         stats[date].failed++;
-//       }
-//     });
-
-//     res.status(200).json({ status: "success", data: Object.values(stats) });
-//   }
-// );
-
 export const getFpsStatusOverviewChartData = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     // Find the FPS record
@@ -182,50 +139,6 @@ export const getAllFpsQrCodeScanStatistics = asyncHandler(
   }
 );
 
-// export const getAllFpsQrCodeScanStatistics = asyncHandler(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const fiveMonthsAgo = new Date();
-//     fiveMonthsAgo.setMonth(fiveMonthsAgo.getMonth() - 5);
-
-//     const fpsRecords = await Fps.findAll({
-//       where: { closeDate: { [Op.gte]: fiveMonthsAgo } },
-//       include: [{ model: FpsHelper, as: "fpsHelper" }],
-//     });
-
-//     if (!fpsRecords.length) {
-//       return next(
-//         new ApiError("No FPS records found for the last 5 months.", 404)
-//       );
-//     }
-
-//     const stats: {
-//       [key: string]: { month: string; scanned: number; unscanned: number };
-//     } = {};
-
-//     fpsRecords.forEach((fps) => {
-//       if (!fps.closeDate) return;
-//       const month = fps.closeDate.toISOString().slice(0, 7);
-
-//       if (!stats[month]) {
-//         stats[month] = { month, scanned: 0, unscanned: 0 };
-//       }
-
-//       fps.fpsHelper?.forEach((helper) => {
-//         if (helper.scanStatus === "scanned") {
-//           stats[month].scanned++;
-//         } else {
-//           stats[month].unscanned++;
-//         }
-//       });
-//     });
-
-//     // Convert object to array to return a table-like format
-//     const statsArray = Object.values(stats);
-
-//     res.status(200).json({ status: "success", data: statsArray });
-//   }
-// );
-
 const getFpsStats = (status: "failed" | "completed") =>
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const currentDate = new Date();
@@ -262,101 +175,6 @@ const getFpsStats = (status: "failed" | "completed") =>
   });
 export const getCompletedFpsStats = getFpsStats("completed");
 export const getFailedFpsStats = getFpsStats("failed");
-
-// export const getCompletedFpsStats = asyncHandler(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const sixMonthsAgo = subMonths(new Date(), 6);
-
-//     const fpsRecords = await Fps.findAll({
-//       where: { closeDate: { [Op.gte]: sixMonthsAgo }, status: "completed" },
-//     });
-
-//     if (!fpsRecords.length) {
-//       return next(
-//         new ApiError("No FPS records found for the last 6 months.", 404)
-//       );
-//     }
-
-//     const stats: { [key: string]: { month: string; completedFPS: number } } =
-//       {};
-
-//     fpsRecords.forEach((fps) => {
-//       if (!fps.closeDate) return;
-//       const month = format(fps.closeDate, "MMM"); // Example: "Jan", "Feb"
-
-//       if (!stats[month]) {
-//         stats[month] = { month, completedFPS: 0 };
-//       }
-//       stats[month].completedFPS++;
-//     });
-
-//     res.status(200).json({ status: "success", data: Object.values(stats) });
-//   }
-// );
-
-// export const getFailedFpsStats = asyncHandler(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const currentDate = new Date();
-//     const startMonth = startOfMonth(subMonths(currentDate, 4)); // Last 5 months including current month
-
-//     const fpsRecords = await Fps.findAll({
-//       where: { closeDate: { [Op.gte]: startMonth }, status: "failed" },
-//     });
-
-//     // Initialize stats for the last 5 months with zero
-//     const stats: { [key: string]: { month: string; failedFPS: number } } = {};
-
-//     for (let i = 0; i < 5; i++) {
-//       const monthDate = subMonths(currentDate, i);
-//       const monthKey = format(monthDate, "MMM");
-//       stats[monthKey] = { month: monthKey, failedFPS: 0 };
-//     }
-
-//     // Populate actual data
-//     fpsRecords.forEach((fps) => {
-//       if (!fps.closeDate) return;
-//       const monthKey = format(fps.closeDate, "MMM");
-//       if (stats[monthKey]) {
-//         stats[monthKey].failedFPS++;
-//       }
-//     });
-
-//     // Sort months chronologically (optional)
-//     const sortedStats = Object.values(stats).reverse();
-
-//     res.status(200).json({ status: "success", data: sortedStats });
-//   }
-// );
-
-// export const getFailedFpsStats = asyncHandler(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const sixMonthsAgo = subMonths(new Date(), 6);
-
-//     const fpsRecords = await Fps.findAll({
-//       where: { closeDate: { [Op.gte]: sixMonthsAgo }, status: "failed" },
-//     });
-
-//     if (!fpsRecords.length) {
-//       return next(
-//         new ApiError("No FPS records found for the last 6 months.", 404)
-//       );
-//     }
-
-//     const stats: { [key: string]: { month: string; failedFPS: number } } = {};
-
-//     fpsRecords.forEach((fps) => {
-//       if (!fps.closeDate) return;
-//       const month = format(fps.closeDate, "MMM"); // Example: "Jan", "Feb"
-
-//       if (!stats[month]) {
-//         stats[month] = { month, failedFPS: 0 };
-//       }
-//       stats[month].failedFPS++;
-//     });
-
-//     res.status(200).json({ status: "success", data: Object.values(stats) });
-//   }
-// );
 
 export const getSelectedUsersForFps = asyncHandler(
   async (req: Request, res: Response) => {
