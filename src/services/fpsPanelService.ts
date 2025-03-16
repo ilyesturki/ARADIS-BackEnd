@@ -22,7 +22,7 @@ export const getFpsPerformanceStats = asyncHandler(
 
     const fpsRecords = await Fps.findAll({
       where: {
-        createdAt: { [Op.gte]: startDate },
+        closeDate: { [Op.gte]: startDate },
       },
     });
 
@@ -35,7 +35,8 @@ export const getFpsPerformanceStats = asyncHandler(
     } = {};
 
     fpsRecords.forEach((fps) => {
-      const date = format(fps.createdAt, "yyyy-MM-dd");
+      if (!fps.closeDate) return;
+      const date = format(fps.closeDate, "yyyy-MM-dd");
 
       if (!stats[date]) {
         stats[date] = { date, completed: 0, failed: 0 };
