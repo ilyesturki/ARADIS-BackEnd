@@ -2,11 +2,21 @@ import express from "express";
 import rateLimit from "express-rate-limit";
 const router = express.Router();
 
-import { setPassword, signIn, verifyToken } from "../services/authService";
+import {
+  forgetPassword,
+  resetPassword,
+  setPassword,
+  signIn,
+  verifyPwResetCode,
+  verifyToken,
+} from "../services/authService";
 import {
   verifyTokenValidator,
   setPasswordValidator,
   signInValidator,
+  forgetPasswordValidator,
+  verifyPwResetCodeValidator,
+  resetPasswordValidator,
 } from "../utils/validators/authValidator";
 
 import {
@@ -44,5 +54,44 @@ router.post(
   setPassword
 );
 router.post("/sign-in", signInValidator, signIn);
+
+/**
+ * @route   POST /forget-password
+ * @desc    Initiate password reset
+ * @access  Public
+ */
+router.post(
+  "/forget-password",
+  uploadUserImage,
+  resizeUserImage,
+  forgetPasswordValidator,
+  forgetPassword
+);
+
+/**
+ * @route   POST /verify-pw-reset-code
+ * @desc    Verify password reset code
+ * @access  Public
+ */
+router.post(
+  "/verify-pw-reset-code",
+  uploadUserImage,
+  resizeUserImage,
+  verifyPwResetCodeValidator,
+  verifyPwResetCode
+);
+
+/**
+ * @route   PUT /reset-password
+ * @desc    Reset user password
+ * @access  Public
+ */
+router.put(
+  "/reset-password",
+  uploadUserImage,
+  resizeUserImage,
+  resetPasswordValidator,
+  resetPassword
+);
 
 export default router;

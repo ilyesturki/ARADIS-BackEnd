@@ -9,6 +9,7 @@ import { Request, Response, NextFunction } from "express";
 import ApiError from "../utils/ApiError";
 import confirmationEmailTemplate from "../utils/emailTemplate/confirmationEmailTemplate";
 import { Op } from "sequelize";
+import resetCodeEmailTemplate from "../utils/emailTemplate/resetCodeEmailTemplate";
 // @desc    Verify activation token and matricule
 // @route   POST /auth/verify-token
 // @access  Public
@@ -123,6 +124,100 @@ export const signIn = asyncHandler(
     const { password: _, ...userObject } = user.dataValues;
 
     res.status(200).json({ data: userObject, token });
+  }
+);
+
+export const forgetPassword = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body;
+    const user = await User.findOne({ where: { email } });
+
+    if (!user || user.status === "inactive") {
+      return next(new ApiError("There is no user with this email", 400));
+    }
+
+    const resetCode = Math.floor(Math.random() * 900000 + 100000).toString();
+    const hashedResetCode = crypto
+      .createHash("sha256")
+      .update(resetCode)
+      .digest("hex");
+
+    await user.update({
+      pwResetCode: hashedResetCode,
+      pwResetExpires: new Date(Date.now() + 10 * 60 * 1000),
+      pwResetVerified: false,
+    });
+
+    try {
+      await sendEmail(
+        resetCodeEmailTemplate(user.firstName, user.email, resetCode)
+      );
+    } catch (err) {
+      await user.update({
+        pwResetCode: null,
+        pwResetExpires: null,
+        pwResetVerified: null,
+      });
+      return next(new ApiError("There is an error in sending email", 500));
+    }
+
+    res
+      .status(200)
+      .json({ status: "success", message: "Reset code sent to email" });
+  }
+);
+
+export const verifyPwResetCode = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email, resetCode } = req.body;
+    const hashedResetCode = crypto
+      .createHash("sha256")
+      .update(resetCode)
+      .digest("hex");
+
+    const user = await User.findOne({
+      where: {
+        email,
+        pwResetCode: hashedResetCode,
+        pwResetExpires: { [Op.gt]: new Date() },
+      },
+    });
+
+    if (!user) {
+      return next(new ApiError("Reset code invalid or expired", 400));
+    }
+
+    await user.update({ pwResetVerified: true });
+    res.status(200).json({ status: "success", message: "Correct reset code" });
+  }
+);
+
+export const resetPassword = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email, password } = req.body;
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return next(new ApiError("There is no user with this email", 404));
+    }
+
+    if (!user.pwResetVerified) {
+      return next(new ApiError("Reset code not verified", 400));
+    }
+
+    // const hashedPassword = await bcrypt.hash(password, +process.env.BCRYPT_SALT);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await user.update({
+      password: hashedPassword,
+      pwUpdatedAt: new Date(),
+      pwResetCode: null,
+      pwResetExpires: null,
+      pwResetVerified: null,
+    });
+
+    res
+      .status(200)
+      .json({ status: "success", message: "Password reset successful" });
   }
 );
 

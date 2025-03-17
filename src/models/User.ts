@@ -144,6 +144,18 @@ class User extends Model {
   @Column(DataType.DATE)
   passwordChangedAt?: Date;
 
+  @AllowNull(true)
+  @Column(DataType.STRING)
+  pwResetCode?: string;
+
+  @AllowNull(true)
+  @Column(DataType.DATE)
+  pwResetExpires?: Date;
+
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  pwResetVerified!: boolean;
+
   // Hash password before saving
   @BeforeSave
   static async hashPassword(instance: User) {

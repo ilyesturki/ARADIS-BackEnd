@@ -36,7 +36,7 @@ sequelize.addModels([
   ImmediateActions,
   SortingResults,
   FpsComment,
-  FpsHelper
+  FpsHelper,
 ]);
 
 (async () => {
