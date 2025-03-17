@@ -157,13 +157,13 @@ class User extends Model {
   pwResetVerified!: boolean;
 
   // Hash password before saving
-  @BeforeSave
-  static async hashPassword(instance: User) {
-    // const salt = process.env.BCRYPT_SALT ? +process.env.BCRYPT_SALT : 10;
-    if (instance.password) {
-      instance.password = await bcrypt.hash(instance.password, 10);
-    }
-  }
+  // @BeforeSave
+  // static async hashPassword(instance: User) {
+  // const salt = process.env.BCRYPT_SALT ? +process.env.BCRYPT_SALT : 10;
+  //   if (instance.password) {
+  //     instance.password = await bcrypt.hash(instance.password, 10);
+  //   }
+  // }
 
   // Set default image before saving
   @BeforeSave

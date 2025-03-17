@@ -70,8 +70,8 @@ export const setPassword = asyncHandler(
     if (!user) {
       return next(new ApiError("Invalid or expired token", 400));
     }
-
-    user.password = newPassword;
+    // password = await bcrypt.hash(instance.password, 10);
+    user.password = await bcrypt.hash(newPassword, 10);
     user.passwordChangedAt = new Date();
 
     // Activate account
