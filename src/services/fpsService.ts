@@ -620,6 +620,7 @@ export const getAllFpsForUser = asyncHandler(
         },
         { model: FpsCause, as: "cause" },
         { model: FpsDefensiveAction, as: "defensiveActions" },
+        { model: User, as: "user" },
       ],
     });
 
@@ -633,6 +634,11 @@ export const getAllFpsForUser = asyncHandler(
       defensiveActions: fps.defensiveActions?.map(
         ({ id, fpsId, ...rest }) => rest
       ),
+      user: {
+        firstName: fps.user.firstName,
+        lastName: fps.user.lastName,
+        image: fps.user.image,
+      },
     }));
 
     // Respond with the FPS data
