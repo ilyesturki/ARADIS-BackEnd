@@ -627,6 +627,7 @@ export const getAllFpsForUser = asyncHandler(
     // Transform the FPS records
     const transformedFpsRecords = fpsRecords.map((fps) => ({
       fpsId: fps.fpsId,
+      status: fps.status,
       currentStep: fps.currentStep,
       problem: fps.problem,
       immediateActions: fps.immediateActions,
