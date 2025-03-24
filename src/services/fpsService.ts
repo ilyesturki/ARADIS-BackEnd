@@ -682,3 +682,43 @@ export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
     data: transformedFpsRecords,
   });
 });
+
+// @desc    Get all FPS records for the logged-in user
+// @route   GET /fps
+// @access  Private
+export const getAllFpsHelperForUser = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?.id;
+
+    // Fetch all FPS records for the logged-in user
+    const fpsRecords = await FpsHelper.findAll({
+      where: { userId },
+      include: [
+        {
+          model: Fps,
+          as: "fps",
+          include: [FpsProblem, User],
+        },
+      ],
+    });
+
+    // Transform the FPS records
+    const transformedFpsRecords = fpsRecords.map((fpsHelper) => ({
+      fpsId: fpsHelper.fps.fpsId,
+      status: fpsHelper.fps.status,
+      currentStep: fpsHelper.fps.currentStep,
+      problem: fpsHelper.fps.problem,
+      user: {
+        firstName: fpsHelper.fps.user.firstName,
+        lastName: fpsHelper.fps.user.lastName,
+        image: fpsHelper.fps.user.image,
+      },
+    }));
+
+    // Respond with the FPS data
+    res.status(200).json({
+      status: "success",
+      data: transformedFpsRecords,
+    });
+  }
+);
