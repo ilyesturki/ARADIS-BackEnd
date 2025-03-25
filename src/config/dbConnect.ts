@@ -9,6 +9,7 @@ import ImmediateActions from "../models/ImmediateActions";
 import SortingResults from "../models/SortingResults";
 import FpsComment from "../models/FpsComment";
 import FpsHelper from "../models/FpsHelper";
+import Notification from "../models/Notification";
 
 const dbConnect = () => {
   const sequelize = new Sequelize({
@@ -28,7 +29,8 @@ const dbConnect = () => {
       ImmediateActions,
       SortingResults,
       FpsComment,
-      FpsHelper
+      FpsHelper,
+      Notification
     ], // Register models here
     logging: false,
   });

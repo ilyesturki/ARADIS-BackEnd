@@ -5,6 +5,9 @@ import FpsCause from "../models/FpsCause";
 import FpsDefensiveAction from "../models/FpsDefensiveAction";
 import asyncHandler from "express-async-handler";
 import { Request, Response, NextFunction } from "express";
+
+import { io } from "../index";
+
 import ApiError from "../utils/ApiError";
 import SortingResults from "../models/SortingResults";
 import ImmediateActions from "../models/ImmediateActions";
@@ -18,6 +21,7 @@ import FpsComment from "../models/FpsComment";
 import User from "../models/User";
 import { createQRCode } from "../utils/createQRCode";
 import FpsHelper from "../models/FpsHelper";
+import { sendNotification } from "../utils/sendNotification";
 const sequelize = dbConnect();
 
 // @desc    Create or update the problem part in FPS
@@ -162,6 +166,16 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
             fpsId: fps.fpsId,
             userId: user.id,
             scanStatus: "unscanned", // Initial status
+          });
+
+          // ✅ Send notification to each assigned user
+          await sendNotification(io, {
+            userId: user.id.toString(),
+            fpsId: fps.fpsId,
+            title: "New FPS Immediate Action",
+            message: `You have been assigned to FPS #${fps.fpsId} for immediate action.`,
+            sender: req.user?.firstName + " " + req.user?.lastName, // Assuming `req.user` contains authenticated user data
+            priority: "high",
           });
         }
       }
