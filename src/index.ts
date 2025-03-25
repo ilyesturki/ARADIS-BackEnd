@@ -2,8 +2,8 @@ import path from "path";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import http from "http"; // added for io
-import { Server as SocketIOServer } from "socket.io"; // added for io
+import http from "http"; // WebSockets
+import { Server as SocketIOServer } from "socket.io"; // WebSockets
 import dbConnect from "./config/dbConnect";
 import globalError from "./middlewares/globalError";
 import ApiError from "./utils/ApiError";
@@ -25,13 +25,13 @@ import FpsHelper from "./models/FpsHelper";
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const app = express();
-const server = http.createServer(app); // added for io
+const server = http.createServer(app); // ✅ WebSocket server setup
 const io = new SocketIOServer(server, {
   cors: {
-    origin: "*", // Update for production
-    methods: ["GET", "POST"],
+    origin: "*",
+    methods: ["GET", "POST", "OPTIONS"], // ✅ Added OPTIONS for WebSocket CORS
   },
-}); // added for io
+});
 
 // Initialize Sequelize
 const sequelize = dbConnect();
@@ -66,19 +66,20 @@ app.set("trust proxy", 1);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// WebSocket Connection Handling // added for io
+// ✅ WebSocket Connection Handling (Improved)
 io.on("connection", (socket) => {
-  console.log(`🟢 New client connected: ${socket.id}`); // added for io
+  console.log(`🟢 New client connected: ${socket.id}`);
 
-  socket.emit("message", "Welcome to the WebSocket server!"); // added for io
+  socket.emit("serverMessage", "Welcome to the WebSocket server!"); // ✅ Fixed event name
 
   socket.on("clientMessage", (data) => {
-    console.log("Received from client:", data); // added for io
-    io.emit("serverMessage", `Server received: ${data}`); // added for io
+    console.log(`📥 Received from client (${socket.id}):`, data);
+
+    io.emit("serverMessage", `Server received: ${data}`); // ✅ Ensured broadcast to all clients
   });
 
   socket.on("disconnect", () => {
-    console.log(`🔴 Client disconnected: ${socket.id}`); // added for io
+    console.log(`🔴 Client disconnected: ${socket.id}`);
   });
 });
 
