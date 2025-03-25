@@ -33,8 +33,8 @@ class Notification extends Model {
   userId!: number; // Recipient user ID
 
   @ForeignKey(() => Fps)
-  @Column(DataType.INTEGER)
-  fpsId!: number; // Related FPS ID (optional)
+  @Column(DataType.STRING)
+  fpsId!: string; // Related FPS ID (optional)
 
   @Default("unread")
   @Column(DataType.ENUM("unread", "read"))
