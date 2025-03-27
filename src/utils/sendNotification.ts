@@ -7,7 +7,7 @@ interface NotificationData {
   title: string;
   message: string;
   sender: string;
-  priority: "low" | "medium" | "high";
+  priority: "Low" | "Medium" | "High";
 }
 
 export const sendNotification = async (

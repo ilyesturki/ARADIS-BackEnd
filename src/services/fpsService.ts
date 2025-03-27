@@ -175,7 +175,7 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
             title: "New FPS Immediate Action",
             message: `You have been assigned to FPS #${fps.fpsId} for immediate action.`,
             sender: req.user?.firstName + " " + req.user?.lastName, // Assuming `req.user` contains authenticated user data
-            priority: "high",
+            priority: "High",
           });
         }
       }
