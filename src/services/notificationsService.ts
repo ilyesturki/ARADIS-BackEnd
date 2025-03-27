@@ -12,3 +12,14 @@ export const getAllLoggedUserNotifications = asyncHandler(async (req, res) => {
   //   res.status(500).json({ message: "Failed to fetch notifications" });
   // }
 });
+
+
+export const getUnreadNotificationsCount = asyncHandler(async (req, res) => {
+  const userId = req.params.id;
+  
+  const unreadCount = await Notification.count({
+    where: { userId, status: "unread" },
+  });
+
+  res.json({ unreadCount });
+});
