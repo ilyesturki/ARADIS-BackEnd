@@ -26,8 +26,12 @@ export const sendNotification = async (
       where: { userId: data.userId, status: "unread" },
     });
 
+    const notifications = Notification.findAll({
+      where: { userId: data.userId },
+      order: [["createdAt", "DESC"]],
+    });
     // Emit notification via WebSocket
-    io.to(`user_${data.userId}`).emit("updatedNotifications", notification);
+    io.to(`user_${data.userId}`).emit("updatedNotifications", notifications);
     io.to(`user_${data.userId}`).emit("unreadNotificationCount", unreadCount);
   } catch (error) {
     console.error("Error sending notification:", error);
