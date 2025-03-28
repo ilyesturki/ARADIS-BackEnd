@@ -26,7 +26,7 @@ export const sendNotification = async (
       where: { userId: data.userId, status: "unread" },
     });
 
-    const notifications = Notification.findAll({
+    const notifications = await Notification.findAll({
       where: { userId: data.userId },
       order: [["createdAt", "DESC"]],
     });
