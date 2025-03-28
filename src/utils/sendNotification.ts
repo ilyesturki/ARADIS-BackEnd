@@ -21,13 +21,13 @@ export const sendNotification = async (
       actionLink: `/fps/${data.fpsId}`,
     });
 
-     // Count unread notifications for the user
-     const unreadCount = await Notification.count({
+    // Count unread notifications for the user
+    const unreadCount = await Notification.count({
       where: { userId: data.userId, status: "unread" },
     });
 
     // Emit notification via WebSocket
-    io.to(`user_${data.userId}`).emit("newNotification", notification);
+    io.to(`user_${data.userId}`).emit("updatedNotifications", notification);
     io.to(`user_${data.userId}`).emit("unreadNotificationCount", unreadCount);
   } catch (error) {
     console.error("Error sending notification:", error);
