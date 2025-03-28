@@ -1,5 +1,7 @@
 import asyncHandler from "express-async-handler";
 import Notification from "../models/Notification";
+import { io } from "../index";
+import ApiError from "../utils/ApiError";
 
 export const getAllLoggedUserNotifications = asyncHandler(async (req, res) => {
   // try {
@@ -13,13 +15,35 @@ export const getAllLoggedUserNotifications = asyncHandler(async (req, res) => {
   // }
 });
 
-
 export const getUnreadNotificationsCount = asyncHandler(async (req, res) => {
   const userId = req.params.id;
-  
+
   const unreadCount = await Notification.count({
     where: { userId, status: "unread" },
   });
 
   res.json({ unreadCount });
+});
+
+export const markNotificationAsRead = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  const notification = await Notification.findByPk(id);
+  if (!notification) {
+    return next(new ApiError("Notification not found", 404));
+  }
+
+  notification.status = "read";
+  await notification.save();
+
+  // ✅ Emit updated unread count via WebSocket
+  const unreadCount = await Notification.count({
+    where: { userId: notification.userId, status: "unread" },
+  });
+  io.to(`user_${notification.userId}`).emit(
+    "unreadNotificationCount",
+    unreadCount
+  );
+
+  res.json({ message: "Notification marked as read" });
 });
