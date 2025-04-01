@@ -18,7 +18,7 @@ export const sendNotification = async (
     // Save to database
     const notification = await Notification.create({
       ...data,
-      actionLink: `/fps/${data.fpsId}`,
+      actionLink: `/dashboard?fpsId=${data.fpsId}`,
     });
 
     // Count unread notifications for the user
