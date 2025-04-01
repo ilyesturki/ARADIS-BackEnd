@@ -17,7 +17,7 @@ export const getAllLoggedUserNotifications = asyncHandler(async (req, res) => {
       "fpsId",
       "status",
       "priority",
-      "actionLink",
+      "actionLink", 
       "createdAt", // Include createdAt
       [
         fn("DATE_FORMAT", col("createdAt"), "%Y-%m-%d %H:%i:%s"),
