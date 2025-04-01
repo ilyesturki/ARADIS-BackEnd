@@ -2,7 +2,7 @@ import { Server as SocketIOServer } from "socket.io";
 import { Server } from "http";
 import { socketAuthMiddleware } from "./middlewares/socketAuth";
 import Notification from "./models/Notification";
-
+import { Op, fn, col } from "sequelize";
 export const setupWebSocket = (server: Server) => {
   const io = new SocketIOServer(server, {
     cors: {
@@ -22,16 +22,55 @@ export const setupWebSocket = (server: Server) => {
 
       // ✅ Send unread notifications count asynchronously (prevents connection delays)
       Notification.count({ where: { userId, status: "unread" } })
-        .then((unreadCount) => socket.emit("unreadNotificationCount", unreadCount))
+        .then((unreadCount) =>
+          socket.emit("unreadNotificationCount", unreadCount)
+        )
         .catch((error) => console.error("Error fetching unread count:", error));
 
       // ✅ Send all notifications to user on connect
+
+      // const notifications = await Notification.findAll({
+      //   where: { userId: req.params.id },
+      //   order: [["createdAt", "DESC"]],
+      //   attributes: [
+      //     "id",
+      //     "title",
+      //     "message",
+      //     "sender",
+      //     "fpsId",
+      //     "status",
+      //     "priority",
+      //     "actionLink",
+      //     "createdAt", // Include createdAt
+      //     [Sequelize.fn("DATE_FORMAT", Sequelize.col("createdAt"), "%Y-%m-%d %H:%i:%s"), "formattedDate"], // Format date if needed
+      //   ],
+      // });
+
       Notification.findAll({
         where: { userId },
         order: [["createdAt", "DESC"]],
+        attributes: [
+          "id",
+          "title",
+          "message",
+          "sender",
+          "fpsId",
+          "status",
+          "priority",
+          "actionLink",
+          "createdAt", // Include createdAt
+          [
+            fn("DATE_FORMAT", col("createdAt"), "%Y-%m-%d %H:%i:%s"),
+            "formattedDate",
+          ], // Format date
+        ],
       })
-        .then((notifications) => socket.emit("updatedNotifications", notifications))
-        .catch((error) => console.error("Error fetching notifications:", error));
+        .then((notifications) =>
+          socket.emit("updatedNotifications", notifications)
+        )
+        .catch((error) =>
+          console.error("Error fetching notifications:", error)
+        );
 
       socket.on("disconnect", () => {
         console.log(`🔴 User disconnected: ${userId}`);

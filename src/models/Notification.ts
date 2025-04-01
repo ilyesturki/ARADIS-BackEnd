@@ -14,7 +14,7 @@ import Fps from "./Fps";
 
 @Table({ tableName: "notifications", timestamps: true })
 class Notification extends Model {
-  @PrimaryKey
+  @PrimaryKey 
   @AutoIncrement
   @Column(DataType.INTEGER)
   id!: number;

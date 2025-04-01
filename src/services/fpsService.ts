@@ -147,6 +147,38 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
     const transaction = await sequelize.transaction();
 
     const alertArr = JSON.parse(alert);
+    // try {
+    //   // Check if FPS exists
+    //   const fps = await Fps.findOne({ where: { fpsId } });
+    //   if (!fps) {
+    //     throw new ApiError("FPS record not found for the provided fpsId.", 404);
+    //   }
+
+    //   // Add helpers (users) based on the alert category
+    //   for (const category of alertArr) {
+    //     const usersInCategory = await User.findAll({
+    //       where: { userService: category, userCategory: "midel-management" }, // Filter users by category
+    //     });
+
+    //     for (const user of usersInCategory) {
+    //       // Add each user as a helper for this FPS
+    //       await FpsHelper.create({
+    //         fpsId: fps.fpsId,
+    //         userId: user.id,
+    //         scanStatus: "unscanned", // Initial status
+    //       });
+
+    //       // ✅ Send notification to each assigned user
+    //       await sendNotification(io, {
+    //         userId: user.id.toString(),
+    //         fpsId: fps.fpsId,
+    //         title: "New FPS Immediate Action",
+    //         message: `You have been assigned to FPS #${fps.fpsId} for immediate action.`,
+    //         sender: req.user?.firstName + " " + req.user?.lastName, // Assuming `req.user` contains authenticated user data
+    //         priority: "High",
+    //       });
+    //     }
+    //   }
     try {
       // Check if FPS exists
       const fps = await Fps.findOne({ where: { fpsId } });
@@ -161,25 +193,31 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
         });
 
         for (const user of usersInCategory) {
-          // Add each user as a helper for this FPS
-          await FpsHelper.create({
-            fpsId: fps.fpsId,
-            userId: user.id,
-            scanStatus: "unscanned", // Initial status
+          // ✅ Check if the user is already assigned as a helper for this FPS
+          const existingHelper = await FpsHelper.findOne({
+            where: { fpsId: fps.fpsId, userId: user.id },
           });
 
-          // ✅ Send notification to each assigned user
-          await sendNotification(io, {
-            userId: user.id.toString(),
-            fpsId: fps.fpsId,
-            title: "New FPS Immediate Action",
-            message: `You have been assigned to FPS #${fps.fpsId} for immediate action.`,
-            sender: req.user?.firstName + " " + req.user?.lastName, // Assuming `req.user` contains authenticated user data
-            priority: "High",
-          });
+          if (!existingHelper) {
+            // ✅ Add the user as a helper only if they are not already assigned
+            await FpsHelper.create({
+              fpsId: fps.fpsId,
+              userId: user.id,
+              scanStatus: "unscanned", // Initial status
+            });
+
+            // ✅ Send notification only if they are newly assigned
+            await sendNotification(io, {
+              userId: user.id.toString(),
+              fpsId: fps.fpsId,
+              title: "New FPS Immediate Action",
+              message: `You have been assigned to FPS #${fps.fpsId} for immediate action.`,
+              sender: req.user?.firstName + " " + req.user?.lastName, // Assuming `req.user` contains authenticated user data
+              priority: "High",
+            });
+          }
         }
       }
-
       // Find or create FPS Immediate Actions
       let fpsImmediateActions = await FpsImmediateActions.findByPk(
         fps.immediatActionsId
@@ -489,22 +527,59 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
 // @desc    Create or update the cause part in FPS
 // @route   POST /fps/cause
 // @access  Private
+// export const createFpsValidation = asyncHandler(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const { status } = req.body;
+//     const { id: fpsId } = req.params;
+//     const fps = await Fps.findOne({ where: { fpsId } });
+//     if (!fps) {
+//       return next(
+//         new ApiError("FPS record not found for the provided fpsId.", 404)
+//       );
+//     }
+
+//     await fps.update({ status, currentStep: "validation" });
+
+//     res.status(201).json({
+//       status: "success",
+//       message: "Status updated successfully.",
+//       data: {
+//         fpsId: fps.fpsId,
+//       },
+//     });
+//   }
+// );
 export const createFpsValidation = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { status } = req.body;
     const { id: fpsId } = req.params;
-    const fps = await Fps.findOne({ where: { fpsId } });
+    const fps = await Fps.findOne({ where: { fpsId }, include: [FpsHelper] });
     if (!fps) {
       return next(
         new ApiError("FPS record not found for the provided fpsId.", 404)
       );
     }
 
+    // Always update to trigger notifications even if status is unchanged
     await fps.update({ status, currentStep: "validation" });
+
+    // ✅ Send notification to all helpers about the final validation status sequentially
+    if (fps.fpsHelper && fps.fpsHelper.length > 0) {
+      for (const helper of fps.fpsHelper) {
+        await sendNotification(io, {
+          userId: helper.userId.toString(),
+          fpsId: fps.fpsId,
+          title: "FPS Final Validation",
+          message: `FPS #${fps.fpsId} has been marked as '${status}'. Thank you for your assistance!`,
+          sender: req.user?.firstName + " " + req.user?.lastName,
+          priority: "High",
+        });
+      }
+    }
 
     res.status(201).json({
       status: "success",
-      message: "Status updated successfully.",
+      message: "Final status updated successfully.",
       data: {
         fpsId: fps.fpsId,
       },

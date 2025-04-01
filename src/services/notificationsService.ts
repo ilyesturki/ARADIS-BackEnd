@@ -1,4 +1,5 @@
 import asyncHandler from "express-async-handler";
+import { Op, fn, col } from "sequelize";
 import Notification from "../models/Notification";
 import { io } from "../index";
 import ApiError from "../utils/ApiError";
@@ -8,8 +9,23 @@ export const getAllLoggedUserNotifications = asyncHandler(async (req, res) => {
   const notifications = await Notification.findAll({
     where: { userId: req.params.id },
     order: [["createdAt", "DESC"]],
+    attributes: [
+      "id",
+      "title",
+      "message",
+      "sender",
+      "fpsId",
+      "status",
+      "priority",
+      "actionLink",
+      "createdAt", // Include createdAt
+      [
+        fn("DATE_FORMAT", col("createdAt"), "%Y-%m-%d %H:%i:%s"),
+        "formattedDate",
+      ], // Format date
+    ],
   });
-  res.json(notifications);
+  res.status(200).json(notifications);
   // } catch (error) {
   //   res.status(500).json({ message: "Failed to fetch notifications" });
   // }
@@ -22,7 +38,7 @@ export const getUnreadNotificationsCount = asyncHandler(async (req, res) => {
     where: { userId, status: "unread" },
   });
 
-  res.json({ unreadCount });
+  res.status(200).json({ unreadCount });
 });
 
 export const markNotificationAsRead = asyncHandler(async (req, res, next) => {
@@ -40,6 +56,21 @@ export const markNotificationAsRead = asyncHandler(async (req, res, next) => {
   const userNotifications = await Notification.findAll({
     where: { userId: notification.userId },
     order: [["createdAt", "DESC"]],
+    attributes: [
+      "id",
+      "title",
+      "message",
+      "sender",
+      "fpsId",
+      "status",
+      "priority",
+      "actionLink",
+      "createdAt", // Include createdAt
+      [
+        fn("DATE_FORMAT", col("createdAt"), "%Y-%m-%d %H:%i:%s"),
+        "formattedDate",
+      ], // Format date
+    ],
   });
 
   // ✅ Count unread notifications
@@ -48,12 +79,21 @@ export const markNotificationAsRead = asyncHandler(async (req, res, next) => {
   });
 
   // ✅ Emit updates to the frontend via WebSockets
-  io.to(`user_${notification.userId}`).emit("unreadNotificationCount", unreadCount);
-  io.to(`user_${notification.userId}`).emit("updatedNotifications", userNotifications);
+  io.to(`user_${notification.userId}`).emit(
+    "unreadNotificationCount",
+    unreadCount
+  );
+  io.to(`user_${notification.userId}`).emit(
+    "updatedNotifications",
+    userNotifications
+  );
 
-  res.json({ message: "Notification marked as read", unreadCount, userNotifications });
+  res.status(200).json({
+    message: "Notification marked as read",
+    unreadCount,
+    userNotifications,
+  });
 });
-
 
 // export const markNotificationAsRead = asyncHandler(async (req, res, next) => {
 //   const { id } = req.params;
