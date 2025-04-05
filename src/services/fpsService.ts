@@ -740,7 +740,16 @@ export const getAllFpsForUser = asyncHandler(
 );
 
 export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
+  const page = Number(req.query.page) || 1;
+  const limit = req.query.limit ? Number(req.query.limit) : null;
+  const offset = limit ? (page - 1) * limit : undefined;
+
+  // Get total count regardless of limit for pagination info
+  const count = await Fps.count();
+
   const fpsRecords = await Fps.findAll({
+    ...(limit && { limit }),
+    ...(offset !== undefined && { offset }),
     include: [
       { model: FpsProblem, as: "problem" },
       {
@@ -754,7 +763,6 @@ export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
     ],
   });
 
-  // Transform the FPS records
   const transformedFpsRecords = fpsRecords.map((fps) => ({
     fpsId: fps.fpsId,
     currentStep: fps.currentStep,
@@ -771,12 +779,64 @@ export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
     },
   }));
 
-  // Respond with the FPS data
+  const paginationResult = limit
+    ? {
+        currentPage: page,
+        limit,
+        numberOfPages: Math.ceil(count / limit),
+        totalItems: count,
+      }
+    : null;
+
   res.status(200).json({
     status: "success",
     data: transformedFpsRecords,
+    ...(paginationResult && { pagination: paginationResult }),
   });
 });
+
+// export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
+//   const page = Number(req.query.page) || 1;
+//   const limit = Number(req.query.limit) || 50;
+//   const offset = (page - 1) * limit;
+
+//   const fpsRecords = await Fps.findAll({
+//     include: [
+//       { model: FpsProblem, as: "problem" },
+//       {
+//         model: FpsImmediateActions,
+//         as: "immediateActions",
+//         include: [SortingResults, ImmediateActions],
+//       },
+//       { model: FpsCause, as: "cause" },
+//       { model: FpsDefensiveAction, as: "defensiveActions" },
+//       { model: User, as: "user" },
+//     ],
+//   });
+
+//   // Transform the FPS records
+//   const transformedFpsRecords = fpsRecords.map((fps) => ({
+//     fpsId: fps.fpsId,
+//     currentStep: fps.currentStep,
+//     problem: fps.problem,
+//     immediateActions: fps.immediateActions,
+//     cause: fps.cause,
+//     defensiveActions: fps.defensiveActions?.map(
+//       ({ id, fpsId, ...rest }) => rest
+//     ),
+//     user: {
+//       firstName: fps.user.firstName,
+//       lastName: fps.user.lastName,
+//       image: fps.user.image,
+//     },
+//   }));
+
+//   // Respond with the FPS data
+//   res.status(200).json({
+//     status: "success",
+//     data: transformedFpsRecords,
+//   });
+// });
 
 // @desc    Get all FPS records for the logged-in user
 // @route   GET /fps
