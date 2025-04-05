@@ -15,7 +15,7 @@ import {
   getAllFpsForUser,
   createFpsValidation,
   getAllFps,
-  getAllFpsHelperForUser,
+  // getAllFpsHelperForUser,
 } from "../services/fpsService";
 import {
   createComment,
@@ -254,14 +254,14 @@ router.route("/me").get(
   getAllFpsForUser
 );
 
-router.route("/helper/me").get(
-  protect,
-  (req, res, next) => {
-    console.log(req.params);
-    next();
-  },
-  getAllFpsHelperForUser
-);
+// router.route("/helper/me").get(
+//   protect,
+//   (req, res, next) => {
+//     console.log(req.params);
+//     next();
+//   },
+//   getAllFpsHelperForUser
+// );
 
 router.route("/").get(
   protect,
