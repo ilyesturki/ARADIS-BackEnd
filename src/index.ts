@@ -9,11 +9,13 @@ import ApiError from "./utils/ApiError";
 import authRoute from "./routes/authRoute";
 import userRoute from "./routes/userRoute";
 import fpsRoute from "./routes/fpsRoute";
+import tagRoute from "./routes/tagRoute";
 import notificationRoute from "./routes/notificationRoute";
 import { setupWebSocket } from "./websocket";
 import User from "./models/User";
 import Fps from "./models/Fps";
 import Notification from "./models/Notification";
+import Tag from "./models/Tag";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
@@ -23,7 +25,7 @@ export const io = setupWebSocket(server); // ✅ Initialize WebSocket
 
 // ✅ Initialize Sequelize and Models
 const sequelize = dbConnect();
-sequelize.addModels([User, Fps, Notification]);
+sequelize.addModels([User, Fps, Tag, Notification]);
 
 (async () => {
   try {
@@ -47,6 +49,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/auth", authRoute);
 app.use("/users", userRoute);
 app.use("/fps", fpsRoute); // Pass io instance
+app.use("/tag", tagRoute);
 app.use("/notifications", notificationRoute);
 
 // Handle undefined routes

@@ -1,10 +1,10 @@
 import QRCode from "qrcode";
 import { customCloudinary } from "./uploadToCloudinary";
 
-export const createQRCode = async (fpsId: string): Promise<string> => {
+export const createQRCode = async (id: string): Promise<string> => {
   try {
     // Generate QR code image as a buffer
-    const qrCodeImage = await QRCode.toBuffer(fpsId);
+    const qrCodeImage = await QRCode.toBuffer(id);
     console.log("QR Code generated:", qrCodeImage);
 
     // Upload to Cloudinary

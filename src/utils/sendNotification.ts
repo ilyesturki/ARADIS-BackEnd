@@ -3,7 +3,8 @@ import Notification from "../models/Notification";
 
 interface NotificationData {
   userId: string;
-  fpsId: string;
+  fpsId?: string;
+  tagId?: string;
   title: string;
   message: string;
   sender: string;
@@ -18,7 +19,11 @@ export const sendNotification = async (
     // Save to database
     const notification = await Notification.create({
       ...data,
-      actionLink: `/dashboard?fpsId=${data.fpsId}`,
+      actionLink: data.fpsId
+        ? `/dashboard?fpsId=${data.fpsId}`
+        : data.tagId
+        ? `/dashboard?tagId=${data.tagId}`
+        : null,
     });
 
     // Count unread notifications for the user

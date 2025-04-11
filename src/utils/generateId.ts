@@ -1,4 +1,4 @@
-export const generateFPSId = (
+export const generateId = (
   prefix: string = "FPS",
   length: number = 8
 ): string => {

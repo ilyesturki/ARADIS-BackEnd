@@ -10,6 +10,7 @@ import SortingResults from "../models/SortingResults";
 import FpsComment from "../models/FpsComment";
 import FpsHelper from "../models/FpsHelper";
 import Notification from "../models/Notification";
+import Tag from "../models/Tag";
 
 const dbConnect = () => {
   const sequelize = new Sequelize({
@@ -22,6 +23,7 @@ const dbConnect = () => {
     models: [
       User,
       Fps,
+      Tag,
       FpsProblem,
       FpsImmediateActions,
       FpsCause,
@@ -30,7 +32,7 @@ const dbConnect = () => {
       SortingResults,
       FpsComment,
       FpsHelper,
-      Notification
+      Notification,
     ], // Register models here
     logging: false,
   });

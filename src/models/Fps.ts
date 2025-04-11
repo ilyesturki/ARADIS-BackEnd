@@ -18,7 +18,7 @@ import FpsDefensiveAction from "./FpsDefensiveAction";
 import FpsImmediateActions from "./FpsImmediateActions";
 import FpsCause from "./FpsCause";
 import User from "./User";
-import { generateFPSId } from "../utils/generateFPSId";
+import { generateId } from "../utils/generateId";
 import FpsHelper from "./FpsHelper";
 
 @Table({
@@ -34,7 +34,7 @@ class Fps extends Model {
   @BeforeCreate
   static generateFpsId(instance: Fps) {
     if (!instance.fpsId) {
-      instance.fpsId = generateFPSId("FPS", 8); // Example: FPS-a1b2c3
+      instance.fpsId = generateId("FPS", 8); // Example: FPS-a1b2c3
     }
   }
 
