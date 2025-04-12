@@ -21,8 +21,6 @@ import {
   getTagStatusOverviewChartData,
   getAllTagQrCodeScanStatistics,
   getCompletedTagStats,
-  getFailedTagStats,
-  getTagPerformanceStats,
 } from "../services/tagPanelService";
 import { protect, allowedTo } from "../services/authService";
 import {
@@ -56,17 +54,6 @@ router.route("/actions/:id").post(
   createOrUpdateTagActions
 );
 
-router.route("/performance-stats-chart/:timeRange").get(
-  protect,
-  uploadTagImages,
-  resizeTagImages,
-  (req, res, next) => {
-    console.log(req.body);
-    console.log(req.params);
-    next();
-  },
-  getTagPerformanceStats
-);
 
 router.route("/all-qr-codes-scan-statistics").get(
   protect,
@@ -104,17 +91,6 @@ router.route("/completed-tag-chart").get(
   getCompletedTagStats
 );
 
-router.route("/failed-tag-chart").get(
-  protect,
-  uploadTagImages,
-  resizeTagImages,
-  (req, res, next) => {
-    console.log(req.body);
-    console.log(req.params);
-    next();
-  },
-  getFailedTagStats
-);
 
 router.route("/selected-users/:id").get(
   protect,
