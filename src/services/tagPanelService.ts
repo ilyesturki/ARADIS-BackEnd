@@ -26,7 +26,7 @@ export const getTagPerformanceStats = asyncHandler(
 
     // Step 1: Build map of date => { toDo, done }
     const statsMap: {
-      [key: string]: { date: string; toDo: number; done: number };
+      [key: string]: { date: string; open: number; toDo: number; done: number };
     } = {};
 
     tagRecords.forEach((tag) => {
@@ -34,14 +34,16 @@ export const getTagPerformanceStats = asyncHandler(
       const dateKey = format(tag.closeDate, "yyyy-MM-dd");
 
       if (!statsMap[dateKey]) {
-        statsMap[dateKey] = { date: dateKey, toDo: 0, done: 0 };
+        statsMap[dateKey] = { date: dateKey, open: 0, toDo: 0, done: 0 };
       }
-      if (tag.status === "toDo") statsMap[dateKey].toDo++;
+      if (tag.status === "open") statsMap[dateKey].open++;
+      else if (tag.status === "toDo") statsMap[dateKey].toDo++;
       else if (tag.status === "done") statsMap[dateKey].done++;
     });
 
     // Step 2: Generate full date range and fill missing
-    const result: { date: string; toDo: number; done: number }[] = [];
+    const result: { date: string; open: number; toDo: number; done: number }[] =
+      [];
     let currentDate = startDate;
 
     for (let i = 0; i < daysToSubtract; i++) {
@@ -50,7 +52,7 @@ export const getTagPerformanceStats = asyncHandler(
       if (statsMap[dateKey]) {
         result.push(statsMap[dateKey]);
       } else {
-        result.push({ date: dateKey, toDo: 0, done: 0 });
+        result.push({ date: dateKey, open: 0, toDo: 0, done: 0 });
       }
       currentDate = addDays(currentDate, 1);
     }
@@ -75,6 +77,7 @@ export const getTagStatusOverviewChartData = asyncHandler(
     // Transform the data to exclude IDs and timestamps
     const transformedTag = {
       total: tagRecords.length,
+      open: tagRecords.filter((tag) => tag.status === "open").length,
       toDo: tagRecords.filter((tag) => tag.status === "toDo").length,
       done: tagRecords.filter((tag) => tag.status === "done").length,
     };
@@ -221,8 +224,8 @@ const getTagStats = (status: "done" | "toDo") =>
       data: sortedStats,
     });
   });
-export const getCompletedTagStats = getTagStats("toDo");
-export const getFailedTagStats = getTagStats("done");
+export const getCompletedTagStats = getTagStats("done");
+export const getFailedTagStats = getTagStats("toDo");
 
 export const getSelectedUsersForTag = asyncHandler(
   async (req: Request, res: Response) => {
