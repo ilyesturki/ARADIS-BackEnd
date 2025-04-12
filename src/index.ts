@@ -16,6 +16,15 @@ import User from "./models/User";
 import Fps from "./models/Fps";
 import Notification from "./models/Notification";
 import Tag from "./models/Tag";
+import FpsHelper from "./models/FpsHelper";
+import FpsComment from "./models/FpsComment";
+import SortingResults from "./models/SortingResults";
+import ImmediateActions from "./models/ImmediateActions";
+import FpsDefensiveAction from "./models/FpsDefensiveAction";
+import FpsCause from "./models/FpsCause";
+import FpsProblem from "./models/FpsProblem";
+import TagAction from "./models/TagAction";
+import FpsImmediateActions from "./models/FpsImmediateActions";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
@@ -25,7 +34,21 @@ export const io = setupWebSocket(server); // ✅ Initialize WebSocket
 
 // ✅ Initialize Sequelize and Models
 const sequelize = dbConnect();
-sequelize.addModels([User, Fps, Tag, Notification]);
+sequelize.addModels([
+  User,
+  Fps,
+  Tag,
+  TagAction,
+  FpsProblem,
+  FpsImmediateActions,
+  FpsCause,
+  FpsDefensiveAction,
+  ImmediateActions,
+  SortingResults,
+  FpsComment,
+  FpsHelper,
+  Notification,
+]);
 
 (async () => {
   try {

@@ -11,6 +11,7 @@ import FpsComment from "../models/FpsComment";
 import FpsHelper from "../models/FpsHelper";
 import Notification from "../models/Notification";
 import Tag from "../models/Tag";
+import TagAction from "../models/TagAction";
 
 const dbConnect = () => {
   const sequelize = new Sequelize({
@@ -24,6 +25,7 @@ const dbConnect = () => {
       User,
       Fps,
       Tag,
+      TagAction,
       FpsProblem,
       FpsImmediateActions,
       FpsCause,
