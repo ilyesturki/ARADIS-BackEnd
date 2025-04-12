@@ -25,6 +25,7 @@ import FpsCause from "./models/FpsCause";
 import FpsProblem from "./models/FpsProblem";
 import TagAction from "./models/TagAction";
 import FpsImmediateActions from "./models/FpsImmediateActions";
+import TagHelper from "./models/TagHelper";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
@@ -39,6 +40,7 @@ sequelize.addModels([
   Fps,
   Tag,
   TagAction,
+  TagHelper,
   FpsProblem,
   FpsImmediateActions,
   FpsCause,
