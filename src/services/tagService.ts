@@ -28,7 +28,7 @@ export const createTag = asyncHandler(
 
     let existingTag = await Tag.findOne({ where: { tagId } });
 
-    if (!existingTag) {
+    if (existingTag) {
       return next(new ApiError("Tag with this ID already exists.", 409));
     }
 
