@@ -63,7 +63,10 @@ export const createOrUpdateTagActions = asyncHandler(
 
     // Find the corresponding TAG in the database
     const tag = await Tag.findOne({ where: { tagId } });
-    if (!tag) return next(new ApiError("TAG not found.", 404));
+    if (!tag)
+      return next(
+        new ApiError("TAG record not found for the provided tagId.", 404)
+      );
 
     // Start a Sequelize transaction for safety
     const transaction = await sequelize.transaction();
@@ -134,7 +137,7 @@ export const createOrUpdateTagActions = asyncHandler(
 
         // Find all midel-management users for this userService
         const users = await User.findAll({
-          where: { userService, userCategory: "midel-management" },
+          where: { userService, userCategory: userCategory },
         });
 
         // For each user, add them as a helper and send a notification
