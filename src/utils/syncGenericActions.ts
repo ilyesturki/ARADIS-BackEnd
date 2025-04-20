@@ -12,6 +12,7 @@ export type SyncBaseItem = {
 
 type SyncParams<T extends SyncBaseItem> = {
   fpsId: string;
+  immediateActionsId?: string;
   newItems: T[];
   senderName: string;
   transaction: Transaction;
@@ -23,6 +24,7 @@ type SyncParams<T extends SyncBaseItem> = {
 
 export async function syncGenericActions<T extends SyncBaseItem>({
   fpsId,
+  immediateActionsId,
   newItems,
   senderName,
   transaction,
@@ -35,7 +37,7 @@ export async function syncGenericActions<T extends SyncBaseItem>({
   const keyField = role === "defensive" ? "fpsId" : "immediateActionsId";
 
   const existing = await model.findAll({
-    where: { [keyField]: fpsId },
+    where: { [keyField]: immediateActionsId ? immediateActionsId : fpsId },
     transaction,
   });
   const existingMap = new Map<string, T>(
@@ -61,7 +63,10 @@ export async function syncGenericActions<T extends SyncBaseItem>({
 
   if (toDelete.length > 0) {
     await model.destroy({
-      where: { [keyField]: fpsId, userService: toDelete },
+      where: {
+        [keyField]: immediateActionsId ? immediateActionsId : fpsId,
+        userService: toDelete,
+      },
       transaction,
     });
 
@@ -74,10 +79,13 @@ export async function syncGenericActions<T extends SyncBaseItem>({
       transaction,
     });
   }
-// 
+  //
   for (const item of toCreate) {
     const { userService, userCategory } = item;
-    await model.create({ ...item, [keyField]: fpsId }, { transaction });
+    await model.create(
+      { ...item, [keyField]: immediateActionsId ? immediateActionsId : fpsId },
+      { transaction }
+    );
 
     const users = await User.findAll({ where: { userService, userCategory } });
 
@@ -114,7 +122,10 @@ export async function syncGenericActions<T extends SyncBaseItem>({
     await model.update(
       { ...item },
       {
-        where: { [keyField]: fpsId, userService: item.userService },
+        where: {
+          [keyField]: immediateActionsId ? immediateActionsId : fpsId,
+          userService: item.userService,
+        },
         transaction,
       }
     );
