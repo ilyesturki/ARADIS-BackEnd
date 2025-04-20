@@ -40,6 +40,12 @@ class FpsHelper extends Model {
   user!: User;
 
   @Column({
+    type: DataType.ARRAY(DataType.STRING),
+    defaultValue: [],
+  })
+  roles!: ("immediate" | "sorting" | "defensive")[]; // e.g. ['immediate', 'sorting', 'defensive']
+
+  @Column({
     type: DataType.ENUM("unscanned", "scanned"),
     defaultValue: "unscanned",
   })

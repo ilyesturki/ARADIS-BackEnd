@@ -137,7 +137,7 @@ export const createOrUpdateTagActions = asyncHandler(
 
         // Find all midel-management users for this userService
         const users = await User.findAll({
-          where: { userService, userCategory: userCategory },
+          where: { userService, userCategory },
         });
 
         // For each user, add them as a helper and send a notification

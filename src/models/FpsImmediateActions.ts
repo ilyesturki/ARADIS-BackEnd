@@ -23,9 +23,6 @@ export class FpsImmediateActions extends Model {
   @Column(DataType.INTEGER)
   id!: number;
 
-  @Column(DataType.JSON)
-  alert!: string[];
-
   @Column(DataType.BOOLEAN)
   startSorting?: boolean;
 
