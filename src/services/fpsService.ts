@@ -181,9 +181,9 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
       const senderName = `${req.user?.firstName ?? "System"} ${
         req.user?.lastName ?? ""
       }`.trim();
-
+      //
       await syncGenericActions({
-        fpsId: immediateActionsId.id.toString(),
+        fpsId: fpsImmediateActions.id.toString(),
         newItems: newSortingResults,
         senderName,
         transaction,
