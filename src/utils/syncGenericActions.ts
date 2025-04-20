@@ -74,7 +74,7 @@ export async function syncGenericActions<T extends SyncBaseItem>({
       transaction,
     });
   }
-
+// 
   for (const item of toCreate) {
     const { userService, userCategory } = item;
     await model.create({ ...item, [keyField]: fpsId }, { transaction });
