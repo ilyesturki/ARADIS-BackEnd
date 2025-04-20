@@ -16,7 +16,6 @@ type SyncParams<T extends SyncBaseItem> = {
   senderName: string;
   transaction: Transaction;
   model: any; // Sequelize model (ImmediateActions, SortingResults, etc.)
-  itemKey: keyof T;
   notifyTitle: string;
   notifyMessage: (item: T, fpsId: string) => string;
   role: "immediate" | "sorting" | "defensive";
@@ -28,12 +27,17 @@ export async function syncGenericActions<T extends SyncBaseItem>({
   senderName,
   transaction,
   model,
-  itemKey,
   notifyTitle,
   notifyMessage,
   role,
 }: SyncParams<T>) {
-  const existing = await model.findAll({ where: { fpsId }, transaction });
+  // Use fpsImmediateActionsId for immediate/sorting roles
+  const keyField = role === "defensive" ? "fpsId" : "fpsImmediateActionsId";
+
+  const existing = await model.findAll({
+    where: { [keyField]: fpsId },
+    transaction,
+  });
   const existingMap = new Map<string, T>(
     existing.map((e: T) => [e.userService, e])
   );
@@ -57,7 +61,7 @@ export async function syncGenericActions<T extends SyncBaseItem>({
 
   if (toDelete.length > 0) {
     await model.destroy({
-      where: { fpsId, userService: toDelete },
+      where: { [keyField]: fpsId, userService: toDelete },
       transaction,
     });
 
@@ -73,7 +77,7 @@ export async function syncGenericActions<T extends SyncBaseItem>({
 
   for (const item of toCreate) {
     const { userService, userCategory } = item;
-    await model.create({ ...item, fpsId }, { transaction });
+    await model.create({ ...item, [keyField]: fpsId }, { transaction });
 
     const users = await User.findAll({ where: { userService, userCategory } });
 
@@ -110,7 +114,7 @@ export async function syncGenericActions<T extends SyncBaseItem>({
     await model.update(
       { ...item },
       {
-        where: { fpsId, userService: item.userService },
+        where: { [keyField]: fpsId, userService: item.userService },
         transaction,
       }
     );

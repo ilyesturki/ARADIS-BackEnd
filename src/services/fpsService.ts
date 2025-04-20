@@ -183,12 +183,11 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
       }`.trim();
 
       await syncGenericActions({
-        fpsId,
+        fpsId: fpsImmediateActions.id.toString(),
         newItems: newSortingResults,
         senderName,
         transaction,
         model: SortingResults,
-        itemKey: "product",
         role: "sorting",
         notifyTitle: "New FPS Sorting Task",
         notifyMessage: (item, fpsId) =>
@@ -196,12 +195,11 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
       });
 
       await syncGenericActions({
-        fpsId,
+        fpsId: fpsImmediateActions.id.toString(),
         newItems: newImmediateActions,
         senderName,
         transaction,
         model: ImmediateActions,
-        itemKey: "description",
         role: "immediate",
         notifyTitle: "New FPS Immediate Action",
         notifyMessage: (item, fpsId) =>
@@ -293,7 +291,6 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
         senderName,
         transaction,
         model: FpsDefensiveAction,
-        itemKey: "procedure",
         role: "defensive",
         notifyTitle: "New FPS Defensive Action",
         notifyMessage: (item, fpsId) =>
@@ -596,7 +593,6 @@ export const getFpsByFpsId = asyncHandler(
       problem: JSONFps.problem,
       immediateActions: JSONFps.immediateActions
         ? {
-            
             startSorting: JSONFps.immediateActions.startSorting,
             concludeFromSorting: JSONFps.immediateActions.concludeFromSorting,
             sortingResults:
