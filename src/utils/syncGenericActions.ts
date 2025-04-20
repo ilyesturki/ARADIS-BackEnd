@@ -32,7 +32,7 @@ export async function syncGenericActions<T extends SyncBaseItem>({
   role,
 }: SyncParams<T>) {
   // Use fpsImmediateActionsId for immediate/sorting roles
-  const keyField = role === "defensive" ? "fpsId" : "fpsImmediateActionsId";
+  const keyField = role === "defensive" ? "fpsId" : "immediateActionsId";
 
   const existing = await model.findAll({
     where: { [keyField]: fpsId },

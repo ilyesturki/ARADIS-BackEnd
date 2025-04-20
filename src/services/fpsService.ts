@@ -183,7 +183,7 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
       }`.trim();
 
       await syncGenericActions({
-        fpsId: fpsImmediateActions.id.toString(),
+        fpsId: immediateActionsId.id.toString(),
         newItems: newSortingResults,
         senderName,
         transaction,
