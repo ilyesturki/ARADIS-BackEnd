@@ -39,10 +39,7 @@ class FpsHelper extends Model {
   @BelongsTo(() => User)
   user!: User;
 
-  @Column({
-    type: DataType.ARRAY(DataType.STRING),
-    defaultValue: [],
-  })
+  @Column({ type: DataType.JSON, allowNull: false, defaultValue: [] })
   roles!: ("immediate" | "sorting" | "defensive")[]; // e.g. ['immediate', 'sorting', 'defensive']
 
   @Column({
