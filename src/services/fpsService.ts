@@ -596,7 +596,7 @@ export const getFpsByFpsId = asyncHandler(
       problem: JSONFps.problem,
       immediateActions: JSONFps.immediateActions
         ? {
-            alert: JSONFps.immediateActions.alert,
+            
             startSorting: JSONFps.immediateActions.startSorting,
             concludeFromSorting: JSONFps.immediateActions.concludeFromSorting,
             sortingResults:

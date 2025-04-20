@@ -13,7 +13,7 @@ export type ImmediatActionsType = {
 };
 
 export type FpsImmediateActionsType = {
-  alert?: string[];
+
   startSorting?: boolean;
   sortingResults?: SortingResultsType[];
   concludeFromSorting?: string;
