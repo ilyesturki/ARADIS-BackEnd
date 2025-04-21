@@ -713,7 +713,9 @@ export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
   const fpsRecords = await Fps.findAll({
     ...(limit && { limit }),
     ...(offset !== undefined && { offset }),
-    where: { line: req.query.line },
+    where: {
+      ...(req.query.line && { "$problem.line$": req.query.line }),
+    },
     include: [
       { model: FpsProblem, as: "problem" },
       {
