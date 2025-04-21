@@ -26,6 +26,7 @@ export const getFpsPerformanceStats = asyncHandler(
         closeDate: { [Op.gte]: startDate },
         ...(req.query.line && { "$problem.line$": req.query.line }),
       },
+      include: [{ model: FpsProblem, as: "problem" }],
     });
 
     // Step 1: Build map of date => { completed, failed }
@@ -71,6 +72,7 @@ export const getFpsStatusOverviewChartData = asyncHandler(
     // Find the FPS record
     const fpsRecords = await Fps.findAll({
       where: { ...(req.query.line && { "$problem.line$": req.query.line }) },
+      include: [{ model: FpsProblem, as: "problem" }],
     });
 
     // If FPS record is not found, throw an error
@@ -115,7 +117,10 @@ export const getAllFpsQrCodeScanStatistics = asyncHandler(
         createdAt: { [Op.gte]: fiveMonthsAgo },
         ...(req.query.line && { "$problem.line$": req.query.line }),
       },
-      include: [{ model: FpsHelper, as: "fpsHelper" }],
+      include: [
+        { model: FpsHelper, as: "fpsHelper" },
+        { model: FpsProblem, as: "problem" },
+      ],
     });
 
     // Define statistics map
@@ -209,6 +214,7 @@ const getFpsStats = (status: "failed" | "completed") =>
         status,
         ...(req.query.line && { "$problem.line$": req.query.line }),
       },
+      include: [{ model: FpsProblem, as: "problem" }],
     });
 
     // Initialize stats
