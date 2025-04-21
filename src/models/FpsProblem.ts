@@ -66,6 +66,13 @@ class FpsProblem extends Model {
 
   @Column(DataType.BOOLEAN)
   clientRisk!: boolean;
+
+  @Column({
+    type: DataType.ENUM("line1", "line2", "line3", "line4"),
+    allowNull: false,
+    defaultValue: "line1",
+  })
+  line!: "line1" | "line2" | "line3" | "line4";
 }
 
 export default FpsProblem;

@@ -22,7 +22,7 @@ export const getFpsPerformanceStats = asyncHandler(
 
     // Fetch FPS records in range
     const fpsRecords = await Fps.findAll({
-      where: { closeDate: { [Op.gte]: startDate } },
+      where: { closeDate: { [Op.gte]: startDate }, line: req.query.line },
     });
 
     // Step 1: Build map of date => { completed, failed }
@@ -66,7 +66,9 @@ export const getFpsPerformanceStats = asyncHandler(
 export const getFpsStatusOverviewChartData = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     // Find the FPS record
-    const fpsRecords = await Fps.findAll();
+    const fpsRecords = await Fps.findAll({
+      where: { line: req.query.line },
+    });
 
     // If FPS record is not found, throw an error
     if (!fpsRecords) {
@@ -106,7 +108,7 @@ export const getAllFpsQrCodeScanStatistics = asyncHandler(
 
     // Fetch FPS records created in the last 5 months (ignoring closeDate)
     const fpsRecords = await Fps.findAll({
-      where: { createdAt: { [Op.gte]: fiveMonthsAgo } },
+      where: { createdAt: { [Op.gte]: fiveMonthsAgo }, line: req.query.line },
       include: [{ model: FpsHelper, as: "fpsHelper" }],
     });
 
@@ -196,7 +198,11 @@ const getFpsStats = (status: "failed" | "completed") =>
     const startMonth = startOfMonth(subMonths(currentDate, 4)); // Last 5 months including current
 
     const fpsRecords = await Fps.findAll({
-      where: { closeDate: { [Op.gte]: startMonth }, status },
+      where: {
+        closeDate: { [Op.gte]: startMonth },
+        status,
+        line: req.query.line,
+      },
     });
 
     // Initialize stats

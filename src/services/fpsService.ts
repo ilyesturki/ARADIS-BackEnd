@@ -45,6 +45,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
       image,
       images,
       clientRisk,
+      line,
     } = req.body;
     const { id: fpsId } = req.params;
     const userId = req.user?.id;
@@ -72,6 +73,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
         image: newImage,
         images: newImages,
         clientRisk,
+        line,
       });
       fps = await Fps.create({
         fpsId,
@@ -97,6 +99,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
           image: newImage,
           images: newImages,
           clientRisk,
+          line,
         });
       }
       if (!fpsProblem) {
@@ -114,6 +117,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
           image: newImage,
           images: newImages,
           clientRisk,
+          line,
         });
         await fps.update({ problemId: fpsProblem.id, currentStep: "problem" });
       }
@@ -658,7 +662,7 @@ export const getAllFpsForUser = asyncHandler(
 
     // Fetch all FPS records for the logged-in user
     const fpsRecords = await Fps.findAll({
-      where: { userId },
+      where: { userId, line: req.query.line },
       include: [
         { model: FpsProblem, as: "problem" },
         {
@@ -709,6 +713,7 @@ export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
   const fpsRecords = await Fps.findAll({
     ...(limit && { limit }),
     ...(offset !== undefined && { offset }),
+    where: { line: req.query.line },
     include: [
       { model: FpsProblem, as: "problem" },
       {
