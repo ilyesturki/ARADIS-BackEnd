@@ -662,7 +662,10 @@ export const getAllFpsForUser = asyncHandler(
 
     // Fetch all FPS records for the logged-in user
     const fpsRecords = await Fps.findAll({
-      where: { userId, line: req.query.line },
+      where: {
+        userId,
+        ...(req.query.line && { "$problem.line$": req.query.line }),
+      },
       include: [
         { model: FpsProblem, as: "problem" },
         {
