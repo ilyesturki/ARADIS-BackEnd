@@ -45,7 +45,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
       image,
       images,
       clientRisk,
-      line,
+      machine,
     } = req.body;
     const { id: fpsId } = req.params;
     const userId = req.user?.id;
@@ -73,7 +73,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
         image: newImage,
         images: newImages,
         clientRisk,
-        line,
+        machine,
       });
       fps = await Fps.create({
         fpsId,
@@ -99,7 +99,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
           image: newImage,
           images: newImages,
           clientRisk,
-          line,
+          machine,
         });
       }
       if (!fpsProblem) {
@@ -117,7 +117,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
           image: newImage,
           images: newImages,
           clientRisk,
-          line,
+          machine,
         });
         await fps.update({ problemId: fpsProblem.id, currentStep: "problem" });
       }
@@ -664,7 +664,7 @@ export const getAllFpsForUser = asyncHandler(
     const fpsRecords = await Fps.findAll({
       where: {
         userId,
-        ...(req.query.line && { "$problem.line$": req.query.line }),
+        ...(req.query.machine && { "$problem.machine$": req.query.machine }),
       },
       include: [
         { model: FpsProblem, as: "problem" },
@@ -717,7 +717,7 @@ export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
     ...(limit && { limit }),
     ...(offset !== undefined && { offset }),
     where: {
-      ...(req.query.line && { "$problem.line$": req.query.line }),
+      ...(req.query.machine && { "$problem.machine$": req.query.machine }),
     },
     include: [
       { model: FpsProblem, as: "problem" },

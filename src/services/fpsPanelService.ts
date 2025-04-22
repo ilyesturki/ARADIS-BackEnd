@@ -24,7 +24,7 @@ export const getFpsPerformanceStats = asyncHandler(
     const fpsRecords = await Fps.findAll({
       where: {
         closeDate: { [Op.gte]: startDate },
-        ...(req.query.line && { "$problem.line$": req.query.line }),
+        ...(req.query.machine && { "$problem.machine$": req.query.machine }),
       },
       include: [{ model: FpsProblem, as: "problem" }],
     });
@@ -71,7 +71,9 @@ export const getFpsStatusOverviewChartData = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     // Find the FPS record
     const fpsRecords = await Fps.findAll({
-      where: { ...(req.query.line && { "$problem.line$": req.query.line }) },
+      where: {
+        ...(req.query.machine && { "$problem.machine$": req.query.machine }),
+      },
       include: [{ model: FpsProblem, as: "problem" }],
     });
 
@@ -115,7 +117,7 @@ export const getAllFpsQrCodeScanStatistics = asyncHandler(
     const fpsRecords = await Fps.findAll({
       where: {
         createdAt: { [Op.gte]: fiveMonthsAgo },
-        ...(req.query.line && { "$problem.line$": req.query.line }),
+        ...(req.query.machine && { "$problem.machine$": req.query.machine }),
       },
       include: [
         { model: FpsHelper, as: "fpsHelper" },
@@ -212,7 +214,7 @@ const getFpsStats = (status: "failed" | "completed") =>
       where: {
         closeDate: { [Op.gte]: startMonth },
         status,
-        ...(req.query.line && { "$problem.line$": req.query.line }),
+        ...(req.query.machine && { "$problem.machine$": req.query.machine }),
       },
       include: [{ model: FpsProblem, as: "problem" }],
     });

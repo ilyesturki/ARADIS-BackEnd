@@ -11,7 +11,11 @@ import { addDays, format, startOfMonth, subDays, subMonths } from "date-fns";
 export const getTagStatusOverviewChartData = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     // Find the TAG record
-    const tagRecords = await Tag.findAll();
+    const tagRecords = await Tag.findAll({
+      where: {
+        machine: req.query.machine,
+      },
+    });
 
     // If TAG record is not found, throw an error
     if (!tagRecords) {
@@ -50,7 +54,10 @@ export const getAllTagQrCodeScanStatistics = asyncHandler(
 
     // Fetch TAG records created in the last 5 months (ignoring closeDate)
     const tagRecords = await Tag.findAll({
-      where: { createdAt: { [Op.gte]: fiveMonthsAgo } },
+      where: {
+        createdAt: { [Op.gte]: fiveMonthsAgo },
+        machine: req.query.machine,
+      },
       include: [{ model: TagHelper, as: "tagHelper" }],
     });
 
@@ -91,7 +98,11 @@ const getTagStats = (status: "done" | "toDo") =>
     const startMonth = startOfMonth(subMonths(currentDate, 4)); // Last 5 months including current
 
     const tagRecords = await Tag.findAll({
-      where: { closeDate: { [Op.gte]: startMonth }, status },
+      where: {
+        closeDate: { [Op.gte]: startMonth },
+        status,
+        machine: req.query.machine,
+      },
     });
 
     // Initialize stats

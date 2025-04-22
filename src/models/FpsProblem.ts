@@ -60,7 +60,7 @@ class FpsProblem extends Model {
   @Column(DataType.STRING)
   image?: string;
 
-  // Change this line to use JSON instead of an array of strings
+  // Change this machine to use JSON instead of an array of strings
   @Column(DataType.JSON)
   images?: string[];
 
@@ -68,11 +68,11 @@ class FpsProblem extends Model {
   clientRisk!: boolean;
 
   @Column({
-    type: DataType.ENUM("line1", "line2", "line3", "line4"),
+    type: DataType.ENUM("machine1", "machine2", "machine3", "machine4"),
     allowNull: false,
-    defaultValue: "line1",
+    defaultValue: "machine1",
   })
-  line!: "line1" | "line2" | "line3" | "line4";
+  machine!: "machine1" | "machine2" | "machine3" | "machine4";
 }
 
 export default FpsProblem;
