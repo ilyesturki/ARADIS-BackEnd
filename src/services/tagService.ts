@@ -484,7 +484,7 @@ export const getAllTag = asyncHandler(async (req: Request, res: Response) => {
     ...(limit && { limit }),
     ...(offset !== undefined && { offset }),
     where: {
-      machine: req.query.machine,
+      ...(req.query.machine && { machine: req.query.machine }),
     },
     include: [
       { model: TagAction, as: "tagAction" },
