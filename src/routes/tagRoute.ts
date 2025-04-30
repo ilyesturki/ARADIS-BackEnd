@@ -12,6 +12,7 @@ import {
   createTagValidation,
   getTagByTagId,
   getAllTag,
+  scanTagQRCode,
   // getAllTagHelperForUser,
 } from "../services/tagService";
 import {
@@ -54,6 +55,17 @@ router.route("/actions/:id").post(
   createOrUpdateTagActions
 );
 
+router.route("/:id/scan").post(
+  protect,
+  uploadTagImages,
+  resizeTagImages,
+  (req, res, next) => {
+    console.log(req.body);
+    console.log(req.params);
+    next();
+  },
+  scanTagQRCode
+);
 
 router.route("/all-qr-codes-scan-statistics").get(
   protect,

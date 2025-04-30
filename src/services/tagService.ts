@@ -444,6 +444,38 @@ export const getTagByTagId = asyncHandler(
   }
 );
 
+// @desc    Scan TAG QR code and update scan status
+// @route   POST /tag/:id/scan
+// @access  Private
+export const scanTagQRCode = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id: tagId } = req.params;
+    const userId = req.user?.id;
+
+    const tag = await Tag.findOne({ where: { tagId } });
+    if (!tag) {
+      return next(new ApiError("TAG not found.", 404));
+    }
+
+    const helper = await TagHelper.findOne({ where: { tagId, userId } });
+    if (!helper) {
+      return next(
+        new ApiError("You are not assigned to this TAG or have no access.", 403)
+      );
+    }
+
+    await helper.update({ scanStatus: "scanned" });
+
+    
+
+    res.status(200).json({
+      status: "success",
+      message: "TAG scanned successfully.",
+    });
+  }
+);
+
+
 // @desc    Get all TAG records for the logged-in user
 // @route   GET /tag
 // @access  Private
@@ -536,3 +568,4 @@ export const getAllTag = asyncHandler(async (req: Request, res: Response) => {
     ...(paginationResult && { pagination: paginationResult }),
   });
 });
+
