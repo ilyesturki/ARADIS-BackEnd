@@ -51,6 +51,15 @@ class Tag extends Model {
   equipment!: string;
 
   @Column(DataType.STRING)
+  description!: string;
+
+  @Column(DataType.STRING)
+  category!: string;
+
+  @Column(DataType.ENUM("Normal", "Urgent", "T.Urgent"))
+  priority!: "Normal" | "Urgent" | "T.Urgent";
+
+  @Column(DataType.STRING)
   image?: string;
 
   // Change this line to use JSON instead of an array of strings
@@ -78,7 +87,6 @@ class Tag extends Model {
     allowNull: true, // The field is optional and will be set when closed
   })
   closeDate?: Date;
-
 }
 
 export default Tag;

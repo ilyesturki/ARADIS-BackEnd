@@ -21,7 +21,16 @@ const sequelize = dbConnect();
 // @access  Private
 export const createTag = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { zone, machine, equipment, image, images } = req.body;
+    const {
+      zone,
+      machine,
+      equipment,
+      description,
+      category,
+      priority,
+      image,
+      images,
+    } = req.body;
 
     const { id: tagId } = req.params;
     const userId = req.user?.id;
@@ -39,6 +48,9 @@ export const createTag = asyncHandler(
       zone,
       machine,
       equipment,
+      description,
+      category,
+      priority,
       image: image ?? null,
       images: images ?? null,
       userId,

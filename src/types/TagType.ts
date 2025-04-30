@@ -11,6 +11,9 @@ export interface TagType {
   zone: string;
   machine: string;
   equipment: string;
+  description: string;
+  category: string;
+  priority: "Normal" | "Urgent" | "T.Urgent";
   image: string;
   images: string[];
   qrCodeUrl: string;
