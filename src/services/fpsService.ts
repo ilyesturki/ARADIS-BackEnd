@@ -846,3 +846,35 @@ export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
 //     });
 //   }
 // );
+
+
+// @desc    Scan FPS QR code and update scan status
+// @route   POST /fps/:id/scan
+// @access  Private
+export const scanFpsQRCode = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id: fpsId } = req.params;
+    const userId = req.user?.id;
+
+    const fps = await Fps.findOne({ where: { fpsId } });
+    if (!fps) {
+      return next(new ApiError("FPS not found.", 404));
+    }
+
+    const helper = await FpsHelper.findOne({ where: { fpsId, userId } });
+    if (!helper) {
+      return next(
+        new ApiError("You are not assigned to this FPS or have no access.", 403)
+      );
+    }
+
+    await helper.update({ scanStatus: "scanned" });
+
+    
+
+    res.status(200).json({
+      status: "success",
+      message: "FPS scanned successfully.",
+    });
+  }
+);

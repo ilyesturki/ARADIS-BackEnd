@@ -15,6 +15,7 @@ import {
   getAllFpsForUser,
   createFpsValidation,
   getAllFps,
+  scanFpsQRCode
   // getAllFpsHelperForUser,
 } from "../services/fpsService";
 import {
@@ -40,6 +41,16 @@ import {
 } from "../middlewares/uploadImage/uploadFpsImage";
 
 const router = express.Router();
+
+router.route("/:id/scan").post(
+  protect,
+  (req, res, next) => {
+    console.log(req.body);
+    console.log(req.params);
+    next();
+  },
+  scanFpsQRCode
+);
 
 router.route("/problem/:id").post(
   protect,
