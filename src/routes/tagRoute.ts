@@ -57,8 +57,6 @@ router.route("/actions/:id").post(
 
 router.route("/:id/scan").post(
   protect,
-  uploadTagImages,
-  resizeTagImages,
   (req, res, next) => {
     console.log(req.body);
     console.log(req.params);
