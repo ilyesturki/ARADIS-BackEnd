@@ -540,6 +540,9 @@ export const getAllTag = asyncHandler(async (req: Request, res: Response) => {
     tagId: tag.tagId,
     zone: tag.zone,
     machine: tag.machine,
+    description:tag.description,
+    category:tag.category,
+      priority:tag.priority,
     equipment: tag.equipment,
     image: tag.image,
     images: tag.images,
@@ -551,7 +554,9 @@ export const getAllTag = asyncHandler(async (req: Request, res: Response) => {
       lastName: tag.user.lastName,
       image: tag.user.image,
     },
+    createdAt: tag.createdAt,
   }));
+
 
   const paginationResult = limit
     ? {
