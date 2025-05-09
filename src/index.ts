@@ -26,6 +26,7 @@ import FpsProblem from "./models/FpsProblem";
 import TagAction from "./models/TagAction";
 import FpsImmediateActions from "./models/FpsImmediateActions";
 import TagHelper from "./models/TagHelper";
+import DeviceToken from "./models/DeviceToken";
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
@@ -50,6 +51,7 @@ sequelize.addModels([
   FpsComment,
   FpsHelper,
   Notification,
+  DeviceToken
 ]);
 
 (async () => {

@@ -1,5 +1,6 @@
 import { Server as SocketIOServer } from "socket.io";
 import Notification from "../models/Notification";
+import DeviceToken from "../models/DeviceToken";
 
 interface NotificationData {
   userId: string;
@@ -25,6 +26,43 @@ export const sendNotification = async (
         ? `/dashboard?tagId=${data.tagId}`
         : null,
     });
+
+    
+
+
+
+
+    const tokens = await DeviceToken.findAll({
+      where: { userId:data.userId, isActive: true },
+    });
+    console.log(tokens);
+    if (tokens.length) {
+      const messages = tokens.map((t) => ({
+        to: t.token,
+        title: data.title,
+        body:data.message,
+      }));
+      console.log(messages);
+      const response = await fetch("https://exp.host/--/api/v2/push/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify(messages),
+      });
+
+      console.log(response);
+      console.log(await response.json());
+      // const data = await response.json();
+  
+    }
+
+   
+
+
+
+
 
     // Count unread notifications for the user
     const unreadCount = await Notification.count({

@@ -10,6 +10,44 @@ import ApiError from "../utils/ApiError";
 import confirmationEmailTemplate from "../utils/emailTemplate/confirmationEmailTemplate";
 import { Op } from "sequelize";
 import resetCodeEmailTemplate from "../utils/emailTemplate/resetCodeEmailTemplate";
+import DeviceToken from "../models/DeviceToken";
+
+
+export const registerDeviceToken = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { token, userId, deviceInfo } = req.body;
+      await DeviceToken.create({
+        token,
+        userId,
+        deviceInfo,
+        isActive: true,
+        provider: "expo",
+      });
+  
+      res.status(200).json({ message: "Token registered" });
+  }
+);
+
+export const removeDeviceToken = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { token } = req.body;
+
+
+    const existing = await DeviceToken.findOne({ where: { token } });
+
+    if (!existing) {
+      return next(
+        new ApiError("Token not found", 404)
+      );
+    }
+
+    await existing.destroy(); 
+
+    res.status(200).json({ message: "Token removed" });
+  }
+);
+
+
 // @desc    Verify activation token and matricule
 // @route   POST /auth/verify-token
 // @access  Public

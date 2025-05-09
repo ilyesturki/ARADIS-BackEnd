@@ -4,6 +4,8 @@ const router = express.Router();
 
 import {
   forgetPassword,
+  registerDeviceToken,
+  removeDeviceToken,
   resetPassword,
   setPassword,
   signIn,
@@ -93,5 +95,20 @@ router.put(
   resetPasswordValidator,
   resetPassword
 );
+
+router.post(
+  "/register-device-token",
+  uploadUserImage,
+  resizeUserImage,
+  registerDeviceToken
+);
+
+router.delete(
+  "/remove-device-token",
+  uploadUserImage,
+  resizeUserImage,
+  removeDeviceToken
+);
+
 
 export default router;

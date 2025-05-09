@@ -13,6 +13,7 @@ import Notification from "../models/Notification";
 import Tag from "../models/Tag";
 import TagAction from "../models/TagAction";
 import TagHelper from "../models/TagHelper";
+import DeviceToken from "../models/DeviceToken";
 
 const dbConnect = () => {
   const sequelize = new Sequelize({
@@ -37,6 +38,7 @@ const dbConnect = () => {
       FpsComment,
       FpsHelper,
       Notification,
+      DeviceToken
     ], // Register models here
     logging: false,
   });
