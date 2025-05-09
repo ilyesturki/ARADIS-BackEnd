@@ -153,55 +153,9 @@ export const createUserValidator = [
 export const updateUserValidator = [
   paramsSanitizer("id"),
   bodySanitizer(
-    "mat",
-    "firstName",
-    "lastName",
-    "email",
-    "phone",
-    "role",
-    "userCategory",
-    "userService",
     "image"
   ),
   param("id").notEmpty().withMessage("id is required"),
-  body("mat")
-    .optional()
-    .isLength({ min: 8, max: 8 })
-    .withMessage("mat must be 8 characters long"),
-  body("firstName")
-    .isLength({ min: 3 })
-    .withMessage("Too short firstName")
-    .isLength({ max: 20 })
-    .withMessage("too long firstName"),
-  body("lastName")
-    .isLength({ min: 3 })
-    .withMessage("Too short lastName")
-    .isLength({ max: 20 })
-    .withMessage("too long lastName"),
-  body("email").isEmail().withMessage("Invalid email address"),
-  body("phone")
-    .isMobilePhone(["ar-TN"])
-    .withMessage("Invalid phone number only accepted TN Phone numbers"),
-  body("role")
-    .optional()
-    .isIn(["user", "admin"])
-    .withMessage("role must be user or admin"),
-  body("userCategory")
-    .optional()
-    .isIn(["corporaite", "top-management", "midel-management", "operational"])
-    .withMessage("select a valid user category"),
-  body("userService")
-    .optional()
-    .isIn([
-      "productions",
-      "maintenance",
-      "logistique",
-      "qualité",
-      "ip",
-      "R&D",
-      "autre",
-    ])
-    .withMessage("select a valid user service"),
   body("image").optional().isString().withMessage("image must be a string"),
 
   validatorMiddleware,
