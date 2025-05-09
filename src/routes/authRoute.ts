@@ -4,6 +4,7 @@ const router = express.Router();
 
 import {
   forgetPassword,
+  protect,
   registerDeviceToken,
   removeDeviceToken,
   resetPassword,
@@ -98,6 +99,7 @@ router.put(
 
 router.post(
   "/register-device-token",
+  protect,
   uploadUserImage,
   resizeUserImage,
   registerDeviceToken
@@ -105,6 +107,7 @@ router.post(
 
 router.delete(
   "/remove-device-token",
+  protect,
   uploadUserImage,
   resizeUserImage,
   removeDeviceToken
