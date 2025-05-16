@@ -21,7 +21,7 @@ class TagAction extends Model {
   id!: number;
 
   @ForeignKey(() => Tag)
-  @Column(DataType.STRING) // ✅ Should match Tag.tagId type
+  @Column(DataType.STRING)
   tagId!: string;
 
   @BelongsTo(() => Tag)

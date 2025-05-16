@@ -15,7 +15,7 @@ import {
   getAllFpsForUser,
   createFpsValidation,
   getAllFps,
-  scanFpsQRCode
+  scanFpsQRCode,
   // getAllFpsHelperForUser,
 } from "../services/fpsService";
 import {
@@ -33,6 +33,7 @@ import {
   getCompletedFpsStats,
   getFailedFpsStats,
   getFpsPerformanceStats,
+  getHelperActions,
 } from "../services/fpsPanelService";
 import { protect, allowedTo } from "../services/authService";
 import {
@@ -51,6 +52,8 @@ router.route("/:id/scan").post(
   },
   scanFpsQRCode
 );
+
+router.route("/helper-actions/:id").get(protect, getHelperActions);
 
 router.route("/problem/:id").post(
   protect,

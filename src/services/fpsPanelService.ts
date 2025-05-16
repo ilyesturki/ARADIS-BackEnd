@@ -8,6 +8,8 @@ import FpsHelper from "../models/FpsHelper";
 
 import { Op } from "sequelize";
 import { addDays, format, startOfMonth, subDays, subMonths } from "date-fns";
+import TagHelper from "../models/TagHelper";
+import Tag from "../models/Tag";
 
 export const getFpsPerformanceStats = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -339,6 +341,49 @@ export const getFpsQrCodeScanStatistics = asyncHandler(
     res.status(200).json({
       status: "success",
       data: transformedFps,
+    });
+  }
+);
+
+export const getHelperActions = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id: userId } = req.params;
+
+    // Fetch all FPS records for the logged-in user
+    const fpsRecords = await FpsHelper.findAll({
+      where: { userId },
+      include: [{ model: Fps, as: "fps" }],
+    });
+    console.log(fpsRecords);
+
+    // Fetch all TAG records for the logged-in user
+    const tagRecords = await TagHelper.findAll({
+      where: { userId },
+      include: [{ model: Tag, as: "tag" }],
+    });
+    console.log(tagRecords);
+
+    const helperActions = {
+      fpsActions: fpsRecords.map((fps) => ({
+        fpsId: fps.fps.fpsId,
+        status: fps.fps.status,
+        image: fps.fps.problem.image,
+        scanStatus: fps.scanStatus,
+        roles: fps.roles,
+      })),
+      tagActions: tagRecords.map((tag) => ({
+        tagId: tag.tag.tagId,
+        status: tag.tag.status,
+        image: tag.tag.image,
+        scanStatus: tag.scanStatus,
+      })),
+    };
+    console.log(helperActions);
+
+    // Respond with the FPS data
+    res.status(200).json({
+      status: "success",
+      data: helperActions,
     });
   }
 );
