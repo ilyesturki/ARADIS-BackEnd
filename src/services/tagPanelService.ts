@@ -13,7 +13,7 @@ export const getTagStatusOverviewChartData = asyncHandler(
     // Find the TAG record
     const tagRecords = await Tag.findAll({
       where: {
-        machine: req.query.machine,
+        ...(req.query.machine && { machine: req.query.machine }),
       },
     });
 
@@ -56,7 +56,7 @@ export const getAllTagQrCodeScanStatistics = asyncHandler(
     const tagRecords = await Tag.findAll({
       where: {
         createdAt: { [Op.gte]: fiveMonthsAgo },
-        machine: req.query.machine,
+        ...(req.query.machine && { machine: req.query.machine }),
       },
       include: [{ model: TagHelper, as: "tagHelper" }],
     });
@@ -101,7 +101,7 @@ const getTagStats = (status: "done" | "toDo") =>
       where: {
         closeDate: { [Op.gte]: startMonth },
         status,
-        machine: req.query.machine,
+        ...(req.query.machine && { machine: req.query.machine }),
       },
     });
 
