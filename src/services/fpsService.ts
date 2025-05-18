@@ -741,6 +741,7 @@ export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
     defensiveActions: fps.defensiveActions?.map(
       ({ id, fpsId, ...rest }) => rest
     ),
+    status: fps.status,
     user: {
       firstName: fps.user.firstName,
       lastName: fps.user.lastName,
@@ -847,7 +848,6 @@ export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
 //   }
 // );
 
-
 // @desc    Scan FPS QR code and update scan status
 // @route   POST /fps/:id/scan
 // @access  Private
@@ -870,13 +870,9 @@ export const scanFpsQRCode = asyncHandler(
 
     await helper.update({ scanStatus: "scanned" });
 
-    
-
     res.status(200).json({
       status: "success",
       message: "FPS scanned successfully.",
     });
   }
 );
-
-
