@@ -367,14 +367,12 @@ export const getHelperActions = asyncHandler(
       fpsActions: fpsRecords.map((fps) => ({
         fpsId: fps.fps.fpsId,
         status: fps.fps.status,
-        image: fps.fps.problem.image,
         scanStatus: fps.scanStatus,
         roles: fps.roles,
       })),
       tagActions: tagRecords.map((tag) => ({
         tagId: tag.tag.tagId,
         status: tag.tag.status,
-        image: tag.tag.image,
         scanStatus: tag.scanStatus,
       })),
     };
