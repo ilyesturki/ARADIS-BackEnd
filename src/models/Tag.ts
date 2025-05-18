@@ -65,7 +65,7 @@ class Tag extends Model {
   // Change this line to use JSON instead of an array of strings
   @Column(DataType.JSON)
   images?: string[];
-
+ 
   @Column(DataType.STRING)
   qrCodeUrl?: string; // Column to store the QR code URL
 
