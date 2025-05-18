@@ -75,10 +75,19 @@ export const createOrUpdateTagActions = asyncHandler(
 
     // Find the corresponding TAG in the database
     const tag = await Tag.findOne({ where: { tagId } });
-    if (!tag)
+    if (!tag) {
       return next(
         new ApiError("TAG record not found for the provided tagId.", 404)
       );
+    }
+
+    if (tag.status == "done") {
+      return next(new ApiError("TAG is already done.", 409));
+    }
+    if (tag.status == "open") {
+      tag.status = "toDo";
+      await tag.save();
+    }
 
     // Start a Sequelize transaction for safety
     const transaction = await sequelize.transaction();
@@ -466,15 +475,12 @@ export const scanTagQRCode = asyncHandler(
 
     await helper.update({ scanStatus: "scanned" });
 
-    
-
     res.status(200).json({
       status: "success",
       message: "TAG scanned successfully.",
     });
   }
 );
-
 
 // @desc    Get all TAG records for the logged-in user
 // @route   GET /tag
@@ -540,9 +546,9 @@ export const getAllTag = asyncHandler(async (req: Request, res: Response) => {
     tagId: tag.tagId,
     zone: tag.zone,
     machine: tag.machine,
-    description:tag.description,
-    category:tag.category,
-      priority:tag.priority,
+    description: tag.description,
+    category: tag.category,
+    priority: tag.priority,
     equipment: tag.equipment,
     image: tag.image,
     images: tag.images,
@@ -556,7 +562,6 @@ export const getAllTag = asyncHandler(async (req: Request, res: Response) => {
     },
     createdAt: tag.createdAt,
   }));
-
 
   const paginationResult = limit
     ? {
@@ -573,4 +578,3 @@ export const getAllTag = asyncHandler(async (req: Request, res: Response) => {
     ...(paginationResult && { pagination: paginationResult }),
   });
 });
-
