@@ -88,7 +88,7 @@ const activationEmailTemplate = (
                 </div>
                 
                 <p class="text-muted" style="text-align: center;">This link expires in ${
-                  process.env.ACTIVATION_TOKEN_EXPIRY || "1 hour"
+                  process.env.ACTIVATION_TOKEN_EXPIRY || "24 hours"
                 }</p>
                 
                 <p>If the button above doesn't work, please copy and paste the following URL into your web browser:</p>
