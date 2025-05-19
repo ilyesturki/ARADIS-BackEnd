@@ -353,6 +353,9 @@ export const getHelperActions = asyncHandler(
     const fpsRecords = await FpsHelper.findAll({
       where: { userId },
       include: [{ model: Fps, as: "fps" }],
+      order: [
+        ['createdAt', 'DESC']
+      ]
     });
     console.log(fpsRecords);
 
@@ -360,25 +363,28 @@ export const getHelperActions = asyncHandler(
     const tagRecords = await TagHelper.findAll({
       where: { userId },
       include: [{ model: Tag, as: "tag" }],
+      order: [
+        ['createdAt', 'DESC']
+      ]
     });
     console.log(tagRecords);
 
-    const helperActions = {
-      fpsActions: fpsRecords.map((fps) => ({
+    const helperActions = [ ...fpsRecords.map((fps) => ({
+      type:"fps",
         fpsId: fps.fps.fpsId,
         status: fps.fps.status,
         scanStatus: fps.scanStatus,
-        roles: fps.roles,
+        createdAt: fps.createdAt,
       })),
-      tagActions: tagRecords.map((tag) => ({
+      ...tagRecords.map((tag) => ({
+        type:"tag",
         tagId: tag.tag.tagId,
         status: tag.tag.status,
         scanStatus: tag.scanStatus,
-      })),
-    };
+        createdAt: tag.createdAt,
+      }))].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     console.log(helperActions);
-
-    // Respond with the FPS data
+    
     res.status(200).json({
       status: "success",
       data: helperActions,
