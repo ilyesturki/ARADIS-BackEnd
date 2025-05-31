@@ -4,13 +4,11 @@ import {
   Model,
   DataType,
   PrimaryKey,
-  AutoIncrement,
   ForeignKey,
   BelongsTo,
   HasMany,
   Unique,
   BeforeCreate,
-  BeforeUpdate,
 } from "sequelize-typescript";
 import User from "./User";
 import { generateId } from "../utils/generateId";
@@ -23,23 +21,23 @@ import TagHelper from "./TagHelper";
 })
 class Tag extends Model {
   @PrimaryKey
-  @Unique // Ensure uniqueness
+  @Unique 
   @Column(DataType.STRING)
   tagId!: string;
 
   @BeforeCreate
   static generateTagId(instance: Tag) {
     if (!instance.tagId) {
-      instance.tagId = generateId("TAG", 8); // Example: TAG-a1b2c3
+      instance.tagId = generateId("TAG", 8); 
     }
   }
 
   @ForeignKey(() => User)
   @Column(DataType.INTEGER)
-  userId!: number; // Each TAG belongs to a specific user
+  userId!: number; 
 
   @BelongsTo(() => User)
-  user!: User; // Relationship with User
+  user!: User; 
 
   @Column(DataType.STRING)
   zone!: string;
@@ -62,12 +60,11 @@ class Tag extends Model {
   @Column(DataType.STRING)
   image?: string;
 
-  // Change this line to use JSON instead of an array of strings
   @Column(DataType.JSON)
   images?: string[];
  
   @Column(DataType.STRING)
-  qrCodeUrl?: string; // Column to store the QR code URL
+  qrCodeUrl?: string; 
 
   @HasMany(() => TagAction)
   tagAction!: TagAction[];
@@ -84,7 +81,7 @@ class Tag extends Model {
 
   @Column({
     type: DataType.DATE,
-    allowNull: true, // The field is optional and will be set when closed
+    allowNull: true, 
   })
   closeDate?: Date;
 }

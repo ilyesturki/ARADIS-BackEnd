@@ -1,10 +1,4 @@
 import express from "express";
-// import {
-//   getFpsValidator,
-//   createFpsValidator,
-//   updateFpsValidator,
-//   deleteFpsValidator,
-// } from "../utils/validators/fpsValidator";
 
 import {
   createOrUpdateFpsProblem,
@@ -16,7 +10,6 @@ import {
   createFpsValidation,
   getAllFps,
   scanFpsQRCode,
-  // getAllFpsHelperForUser,
 } from "../services/fpsService";
 import {
   createComment,
@@ -35,7 +28,7 @@ import {
   getFpsPerformanceStats,
   getHelperActions,
 } from "../services/fpsPanelService";
-import { protect, allowedTo } from "../services/authService";
+import { protect } from "../services/authService";
 import {
   resizeFpsImages,
   uploadFpsImages,
@@ -222,7 +215,7 @@ router.route("/comments/:id").post(
   },
   createComment
 );
-// test
+
 router.route("/comments/:id").put(
   protect,
   uploadFpsImages,
@@ -268,14 +261,6 @@ router.route("/me").get(
   getAllFpsForUser
 );
 
-// router.route("/helper/me").get(
-//   protect,
-//   (req, res, next) => {
-//     console.log(req.params);
-//     next();
-//   },
-//   getAllFpsHelperForUser
-// );
 
 router.route("/").get(
   protect,

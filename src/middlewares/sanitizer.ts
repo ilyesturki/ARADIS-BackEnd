@@ -25,17 +25,3 @@ export const querySanitizer = (...allowedFields: string[]) =>
     next();
   });
 
-// import { Request, Response, NextFunction } from "express";
-// import asyncHandler from "express-async-handler";
-
-// const sanitizer = (...allowedFields: string[]) =>
-//   asyncHandler((req: Request, res: Response, next: NextFunction) => {
-//     const sanitizedEntries = Object.entries(req.body).filter(([key]) =>
-//       allowedFields.includes(key)
-//     );
-
-//     req.body = Object.fromEntries(sanitizedEntries);
-//     next();
-//   });
-
-// export default sanitizer;

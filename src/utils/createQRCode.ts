@@ -3,15 +3,12 @@ import { customCloudinary } from "./uploadToCloudinary";
 
 export const createQRCode = async (id: string): Promise<string> => {
   try {
-    // Generate QR code image as a buffer
     const qrCodeImage = await QRCode.toBuffer(id);
     console.log("QR Code generated:", qrCodeImage);
 
-    // Upload to Cloudinary
     const uploadResult = await customCloudinary(qrCodeImage);
     console.log("Cloudinary upload result:", uploadResult);
 
-    // Return the Cloudinary URL
     return uploadResult.secure_url;
   } catch (error) {
     console.error("Error generating or uploading QR code:", error);

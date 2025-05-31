@@ -40,7 +40,7 @@ class FpsHelper extends Model {
   user!: User;
 
   @Column({ type: DataType.JSON, allowNull: false, defaultValue: [] })
-  roles!: ("immediate" | "sorting" | "defensive")[]; // e.g. ['immediate', 'sorting', 'defensive']
+  roles!: ("immediate" | "sorting" | "defensive")[];
 
   @Column({
     type: DataType.ENUM("unscanned", "scanned"),

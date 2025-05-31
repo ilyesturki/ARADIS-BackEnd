@@ -2,11 +2,9 @@ import Fps from "../models/Fps";
 import asyncHandler from "express-async-handler";
 import { Request, Response, NextFunction } from "express";
 import ApiError from "../utils/ApiError";
-import dbConnect from "../config/dbConnect";
 import FpsComment from "../models/FpsComment";
 import User from "../models/User";
-
-// Create a new comment
+ 
 export const createComment = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { userId, comment, date, rating } = req.body;
@@ -40,7 +38,6 @@ export const createComment = asyncHandler(
   }
 );
 
-// Update an existing comment
 export const updateComment = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
@@ -64,7 +61,6 @@ export const updateComment = asyncHandler(
   }
 );
 
-// Delete a comment
 export const deleteComment = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;

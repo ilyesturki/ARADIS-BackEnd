@@ -8,7 +8,6 @@ import {
   ForeignKey,
   BelongsTo,
 } from "sequelize-typescript";
-import { FpsDefensiveActionType } from "../types/FpsDefensiveActionType";
 import Fps from "./Fps";
 
 @Table({
@@ -22,7 +21,7 @@ class FpsDefensiveAction extends Model {
   id!: number;
 
   @ForeignKey(() => Fps)
-  @Column(DataType.STRING) // ✅ Should match Fps.fpsId type
+  @Column(DataType.STRING) 
   fpsId!: string;
 
   @BelongsTo(() => Fps)

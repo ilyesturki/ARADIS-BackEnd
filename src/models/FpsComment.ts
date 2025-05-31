@@ -8,7 +8,6 @@ import {
   ForeignKey,
   BelongsTo,
 } from "sequelize-typescript";
-import { FpsCommentType } from "../types/FpsCommentType";
 import Fps from "./Fps";
 import User from "./User";
 
@@ -23,7 +22,7 @@ class FpsComment extends Model {
   id!: number;
 
   @ForeignKey(() => Fps)
-  @Column(DataType.STRING) // ✅ Should match Fps.fpsId type
+  @Column(DataType.STRING)
   fpsId!: string;
 
   @BelongsTo(() => Fps)
@@ -34,7 +33,7 @@ class FpsComment extends Model {
   userId!: number;
 
   @BelongsTo(() => User)
-  user!: User; // Relationship with User
+  user!: User; 
 
   @Column(DataType.STRING)
   comment!: string;

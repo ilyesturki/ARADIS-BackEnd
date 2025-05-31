@@ -6,7 +6,6 @@ import {
   PrimaryKey,
   AutoIncrement,
 } from "sequelize-typescript";
-import { FpsProblemType } from "../types/FpsProblemType";
 
 @Table({
   tableName: "fps_problems",
@@ -60,7 +59,6 @@ class FpsProblem extends Model {
   @Column(DataType.STRING)
   image?: string;
 
-  // Change this machine to use JSON instead of an array of strings
   @Column(DataType.JSON)
   images?: string[];
 
@@ -74,7 +72,5 @@ class FpsProblem extends Model {
   })
   machine!: "machine1" | "machine2" | "machine3" | "machine4";
 }
-
-//
 
 export default FpsProblem;

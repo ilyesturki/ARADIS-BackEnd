@@ -7,9 +7,7 @@ import ApiError from "../utils/ApiError";
 import sendEmail from "../utils/sendEmail";
 import activationEmailTemplate from "../utils/emailTemplate/activationEmailTemplate ";
 
-// @desc    Create a new user
-// @route   POST /users
-// @access  Admin
+
 export const createUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const {
@@ -34,18 +32,16 @@ export const createUser = asyncHandler(
       userCategory,
       userService
     );
-    // Check if user already exists
     const existingUser = await User.findOne({ where: { mat: mat } });
 
     if (existingUser) {
       if (existingUser.status === "active") {
         return next(new ApiError("User already exists", 400));
       } else {
-        await existingUser.destroy(); // Remove inactive user
+        await existingUser.destroy(); 
       }
     }
 
-    // Create new user (status: pending activation)
     const user = await User.create({
       mat,
       firstName,
@@ -59,7 +55,6 @@ export const createUser = asyncHandler(
       image,
     });
 
-    // Generate secure activation token
     const activationToken = crypto.randomBytes(32).toString("hex");
     const hashedToken = crypto
       .createHash("sha256")
@@ -68,20 +63,16 @@ export const createUser = asyncHandler(
 
     await user.update({
       activationToken: hashedToken,
-      activationTokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours expiration
+      activationTokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000), 
     });
 
-    // Construct the activation link
     const activationUrl = `${process.env.FRONTEND_URL}/auth/activate?token=${activationToken}`;
-    // const activationUrl = `https://9000-idx-aradis-frontend-1739358595337.cluster-4ezwrnmkojawstf2k7vqy36oe6.cloudworkstations.dev/auth/activate?token=${activationToken}`;
 
-    // Send email
     try {
       await sendEmail(
         activationEmailTemplate(user.firstName, user.email, activationUrl)
       );
     } catch (err) {
-      // Clean up token if email fails
       user.activationToken = undefined;
       user.activationTokenExpires = undefined;
 
@@ -98,22 +89,10 @@ export const createUser = asyncHandler(
   }
 );
 
-// @desc    Get a list of users
-// @route   GET /users
-// @access  Admin
 export const getUsers = factory.getAll(User);
 
-// @desc    Update a specific user by ID
-// @route   PUT /users/:id
-// @access  Private/Admin
 export const updateUser = factory.updateOne(User);
 
-// @desc    Delete a specific user by ID
-// @route   DELETE /users/:id
-// @access  Private/Admin
 export const deleteUser = factory.deleteOne(User);
 
-// @desc    Get a specific user by ID
-// @route   GET /users/:id
-// @access  Private/Admin
 export const getUser = factory.getOne(User);

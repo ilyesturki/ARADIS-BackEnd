@@ -16,7 +16,7 @@ type SyncParams<T extends SyncBaseItem> = {
   newItems: T[];
   senderName: string;
   transaction: Transaction;
-  model: any; // Sequelize model (ImmediateActions, SortingResults, etc.)
+  model: any; 
   notifyTitle: string;
   notifyMessage: (item: T, fpsId: string) => string;
   role: "immediate" | "sorting" | "defensive";
@@ -33,7 +33,7 @@ export async function syncGenericActions<T extends SyncBaseItem>({
   notifyMessage,
   role,
 }: SyncParams<T>) {
-  // Use fpsImmediateActionsId for immediate/sorting roles
+
   const keyField = role === "defensive" ? "fpsId" : "immediateActionsId";
 
   const existing = await model.findAll({
@@ -79,7 +79,7 @@ export async function syncGenericActions<T extends SyncBaseItem>({
       transaction,
     });
   }
-  //
+  
   for (const item of toCreate) {
     const { userService, userCategory } = item;
     await model.create(

@@ -26,15 +26,15 @@ class Notification extends Model {
   message!: string;
 
   @Column(DataType.STRING)
-  sender!: string; // "System" or a user ID
+  sender!: string;
 
   @ForeignKey(() => User)
   @Column(DataType.INTEGER)
-  userId!: number; // Recipient user ID
+  userId!: number; 
 
   @ForeignKey(() => Fps)
   @Column(DataType.STRING)
-  fpsId!: string; // Related FPS ID (optional)
+  fpsId!: string; 
 
   @Default("unread")
   @Column(DataType.ENUM("unread", "read"))
@@ -44,7 +44,7 @@ class Notification extends Model {
   priority!: "High" | "Medium" | "Low";
 
   @Column(DataType.STRING)
-  actionLink!: string; // A link to FPS details
+  actionLink!: string;
 
   @BelongsTo(() => User)
   user!: User;

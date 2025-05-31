@@ -8,7 +8,7 @@ declare global {
       userId?: string;
       file?: Multer.File;
       files?: { [fieldname: string]: Multer.File[] } | Multer.File[];
-      filterObj?: WhereOptions; // Replacing Mongoose's FilterQuery with Sequelize's WhereOptions
+      filterObj?: WhereOptions; 
     }
   }
 } 

@@ -27,26 +27,26 @@ import FpsHelper from "./FpsHelper";
 })
 class Fps extends Model {
   @PrimaryKey
-  @Unique // Ensure uniqueness
+  @Unique 
   @Column(DataType.STRING)
   fpsId!: string;
 
   @BeforeCreate
   static generateFpsId(instance: Fps) {
     if (!instance.fpsId) {
-      instance.fpsId = generateId("FPS", 8); // Example: FPS-a1b2c3
+      instance.fpsId = generateId("FPS", 8); 
     }
   }
 
   @Column(DataType.STRING)
-  qrCodeUrl?: string; // Column to store the QR code URL
+  qrCodeUrl?: string; 
 
   @ForeignKey(() => User)
   @Column(DataType.INTEGER)
-  userId!: number; // Each FPS belongs to a specific user
+  userId!: number; 
 
   @BelongsTo(() => User)
-  user!: User; // Relationship with User
+  user!: User; 
 
   @ForeignKey(() => FpsProblem)
   @Column(DataType.INTEGER)
@@ -81,7 +81,7 @@ class Fps extends Model {
       "validation"
     ),
     allowNull: false,
-    defaultValue: "problem", // Default to the first step
+    defaultValue: "problem", 
   })
   currentStep!:
     | "problem"
@@ -102,7 +102,7 @@ class Fps extends Model {
 
   @Column({
     type: DataType.DATE,
-    allowNull: true, // The field is optional and will be set when closed
+    allowNull: true, 
   })
   closeDate?: Date;
 

@@ -8,10 +8,8 @@ import {
 
 const router = Router();
 
-// ✅ Get User's Notifications
 router.get("/:id", protect, getAllLoggedUserNotifications);
 
-// ✅ Get Unread Notifications Count (NEW)
 router.get("/:id/unread-count", protect, getUnreadNotificationsCount);
 
 router.put("/:id/read", protect, markNotificationAsRead);

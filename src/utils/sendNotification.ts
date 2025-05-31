@@ -17,7 +17,6 @@ export const sendNotification = async (
   data: NotificationData
 ) => {
   try {
-    // Save to database
     const notification = await Notification.create({
       ...data,
       actionLink: data.fpsId
@@ -51,20 +50,9 @@ export const sendNotification = async (
         },
         body: JSON.stringify(messages),
       });
-
-      console.log(response);
-      console.log(await response.json());
-      // const data = await response.json();
   
     }
 
-   
-
-
-
-
-
-    // Count unread notifications for the user
     const unreadCount = await Notification.count({
       where: { userId: data.userId, status: "unread" },
     });
@@ -73,7 +61,6 @@ export const sendNotification = async (
       where: { userId: data.userId },
       order: [["createdAt", "DESC"]],
     });
-    // Emit notification via WebSocket
     io.to(`user_${data.userId}`).emit("updatedNotifications", notifications);
     io.to(`user_${data.userId}`).emit("unreadNotificationCount", unreadCount);
   } catch (error) {

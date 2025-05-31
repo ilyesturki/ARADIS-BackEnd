@@ -18,13 +18,11 @@ export const uploadTagImages = uploadMixOfImages([
 export const resizeTagImages = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     if (req.files && isFieldDictionary(req.files)) {
-      // Process single image upload (if it exists)
       if (req.files["image"]?.[0]) {
         const result = await customCloudinary(req.files["image"][0].buffer);
         req.body.image = result.secure_url;
       }
 
-      // Process multiple image uploads (if they exist)
       if (req.files["images"]?.length > 0) {
         const uploadedImages = await Promise.all(
           req.files["images"].map(async (file) => {
@@ -40,7 +38,6 @@ export const resizeTagImages = asyncHandler(
   }
 );
 
-// Type Guard to ensure req.files is of the correct type
 function isFieldDictionary(
   files: unknown
 ): files is { [fieldname: string]: Express.Multer.File[] } {

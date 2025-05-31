@@ -39,7 +39,7 @@ const dbConnect = () => {
       FpsHelper,
       Notification,
       DeviceToken
-    ], // Register models here
+    ], 
     logging: false,
   });
 

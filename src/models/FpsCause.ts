@@ -18,11 +18,9 @@ export class FpsCause extends Model {
   @Column(DataType.INTEGER)
   id!: number;
 
-  // Change this line to use JSON instead of an array of strings
   @Column(DataType.JSON)
   causeList!: string[];
 
-  // Change this line to use JSON instead of an array of strings
   @Column(DataType.JSON)
   whyList!: string[];
 }

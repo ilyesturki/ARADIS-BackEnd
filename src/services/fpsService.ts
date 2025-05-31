@@ -26,9 +26,6 @@ import { syncGenericActions } from "../utils/syncGenericActions";
 
 const sequelize = dbConnect();
 
-// @desc    Create or update the problem part in FPS
-// @route   POST /fps/problem
-// @access  Private
 export const createOrUpdateFpsProblem = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const {
@@ -56,8 +53,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
     let fps = await Fps.findOne({ where: { fpsId } });
     let fpsProblem;
     if (!fps) {
-      // Generate the QR code and upload to Cloudinary
-      const qrCodeUrl = await createQRCode(fpsId); // Save QR code URL from Cloudinary
+      const qrCodeUrl = await createQRCode(fpsId); 
 
       fpsProblem = await FpsProblem.create({
         type,
@@ -80,7 +76,7 @@ export const createOrUpdateFpsProblem = asyncHandler(
         problemId: fpsProblem.id,
         currentStep: "problem",
         userId,
-        qrCodeUrl, // Save the QR code URL
+        qrCodeUrl, 
       });
     } else {
       fpsProblem = await FpsProblem.findByPk(fps.problemId);
@@ -121,9 +117,8 @@ export const createOrUpdateFpsProblem = asyncHandler(
         });
         await fps.update({ problemId: fpsProblem.id, currentStep: "problem" });
       }
-      // Update FPS record (if the QR code hasn't been generated yet)
       if (!fps.qrCodeUrl) {
-        const qrCodeUrl = await createQRCode(fpsId); // Generate QR code if it's not already saved
+        const qrCodeUrl = await createQRCode(fpsId); 
         await fps.update({ qrCodeUrl });
       }
     }
@@ -139,9 +134,6 @@ export const createOrUpdateFpsProblem = asyncHandler(
   }
 );
 
-// @desc    Create or update the immediate actions part in FPS
-// @route   POST /fps/immediate-actions
-// @access  Private
 export const createOrUpdateFpsImmediateActions = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id: fpsId } = req.params;
@@ -185,7 +177,6 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
       const senderName = `${req.user?.firstName ?? "System"} ${
         req.user?.lastName ?? ""
       }`.trim();
-      //
       await syncGenericActions({
         fpsId,
         immediateActionsId: fpsImmediateActions.id.toString(),
@@ -228,9 +219,6 @@ export const createOrUpdateFpsImmediateActions = asyncHandler(
   }
 );
 
-// @desc    Create or update the cause part in FPS
-// @route   POST /fps/cause
-// @access  Private
 export const createOrUpdateFpsCause = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { causeList, whyList } = req.body;
@@ -254,7 +242,7 @@ export const createOrUpdateFpsCause = asyncHandler(
       fpsCause = await FpsCause.create({ causeList, whyList });
       await fps.update({ causeId: fpsCause.id, currentStep: "cause" });
     } else {
-      await fps.update({ currentStep: "cause" }); // Update the currentStep
+      await fps.update({ currentStep: "cause" }); 
     }
 
     res.status(201).json({
@@ -268,9 +256,6 @@ export const createOrUpdateFpsCause = asyncHandler(
   }
 );
 
-// @desc    Create or update the defensive actions part in FPS
-// @route   POST /fps/defensive-actions
-// @access  Private
 export const createOrUpdateFpsDefensiveActions = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id: fpsId } = req.params;
@@ -323,196 +308,6 @@ export const createOrUpdateFpsDefensiveActions = asyncHandler(
   }
 );
 
-// export const createOrUpdateFpsDefensiveActions = asyncHandler(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const { id: fpsId } = req.params;
-//     let defensiveActionsArr;
-
-//     try {
-//       defensiveActionsArr = JSON.parse(req.body.defensiveActions);
-//     } catch (error) {
-//       return next(
-//         new ApiError("Invalid JSON format in defensiveActions.", 400)
-//       );
-//     }
-
-//     if (!Array.isArray(defensiveActionsArr)) {
-//       return next(new ApiError("Defensive actions must be an array.", 400));
-//     }
-
-//     const fps = await Fps.findOne({ where: { fpsId } });
-//     if (!fps) {
-//       return next(
-//         new ApiError("FPS record not found for the provided fpsId.", 404)
-//       );
-//     }
-
-//     const transaction = await sequelize.transaction();
-
-//     try {
-//       // Get existing actions linked to this FPS
-//       const existingActions = await FpsDefensiveAction.findAll({
-//         where: { fpsId: fps.fpsId },
-//         transaction,
-//       });
-
-//       const existingIds = new Set(existingActions.map((action) => action.id));
-//       const receivedIds = new Set(
-//         defensiveActionsArr.map((action) => action.id).filter(Boolean)
-//       );
-
-//       // Bulk delete actions that are no longer in the request
-//       await FpsDefensiveAction.destroy({
-//         where: {
-//           id: Array.from(existingIds).filter((id) => !receivedIds.has(id)),
-//         },
-//         transaction,
-//       });
-
-//       // Bulk create or update defensive actions
-//       await FpsDefensiveAction.bulkCreate(
-//         defensiveActionsArr.map(
-//           ({ id, procedure, userCategory, userService, quand }) => ({
-//             id,
-//             procedure,
-//             userCategory,
-//             userService,
-//             quand,
-//             fpsId: fps.fpsId,
-//           })
-//         ),
-//         {
-//           updateOnDuplicate: [
-//             "procedure",
-//             "userCategory",
-//             "userService",
-//             "quand",
-//           ],
-//           transaction,
-//         }
-//       );
-
-//       // Update FPS current step
-//       await fps.update({ currentStep: "defensiveActions" }, { transaction });
-
-//       await transaction.commit();
-
-//       res.status(201).json({
-//         status: "success",
-//         message: "Defensive actions created, updated, or deleted successfully.",
-//         data: {
-//           fpsId: fps.fpsId,
-//           defensiveActions: defensiveActionsArr,
-//         },
-//       });
-//     } catch (error) {
-//       await transaction.rollback();
-//       next(
-//         new ApiError(
-//           "An error occurred while processing defensive actions.",
-//           500
-//         )
-//       );
-//     }
-//   }
-// );
-// export const createOrUpdateFpsDefensiveActions = asyncHandler(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const { id: fpsId } = req.params;
-//     let defensiveActionsArr;
-
-//     try {
-//       defensiveActionsArr = JSON.parse(req.body.defensiveActions);
-//     } catch (error) {
-//       return next(
-//         new ApiError("Invalid JSON format in defensiveActions.", 400)
-//       );
-//     }
-
-//     if (!Array.isArray(defensiveActionsArr)) {
-//       return next(new ApiError("Defensive actions must be an array.", 400));
-//     }
-
-//     const fps = await Fps.findOne({ where: { fpsId } });
-//     if (!fps) {
-//       return next(
-//         new ApiError("FPS record not found for the provided fpsId.", 404)
-//       );
-//     }
-
-//     const transaction = await sequelize.transaction();
-
-//     try {
-//       // Delete all existing defensive actions for this FPS
-//       await FpsDefensiveAction.destroy({
-//         where: { fpsId: fps.fpsId },
-//         transaction,
-//       });
-
-//       // Bulk insert new defensive actions
-//       await FpsDefensiveAction.bulkCreate(
-//         defensiveActionsArr.map(
-//           ({ procedure, userCategory, userService, quand }) => ({
-//             procedure,
-//             userCategory,
-//             userService,
-//             quand,
-//             fpsId: fps.fpsId,
-//           })
-//         ),
-//         { transaction }
-//       );
-
-//       // Update FPS current step
-//       await fps.update({ currentStep: "defensiveActions" }, { transaction });
-
-//       await transaction.commit();
-
-//       res.status(201).json({
-//         status: "success",
-//         message: "Defensive actions recreated successfully.",
-//         data: {
-//           fpsId: fps.fpsId,
-//           defensiveActions: defensiveActionsArr,
-//         },
-//       });
-//     } catch (error) {
-//       await transaction.rollback();
-//       next(
-//         new ApiError(
-//           "An error occurred while recreating defensive actions.",
-//           500
-//         )
-//       );
-//     }
-//   }
-// );
-
-// @desc    Create or update the cause part in FPS
-// @route   POST /fps/cause
-// @access  Private
-// export const createFpsValidation = asyncHandler(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const { status } = req.body;
-//     const { id: fpsId } = req.params;
-//     const fps = await Fps.findOne({ where: { fpsId } });
-//     if (!fps) {
-//       return next(
-//         new ApiError("FPS record not found for the provided fpsId.", 404)
-//       );
-//     }
-
-//     await fps.update({ status, currentStep: "validation" });
-
-//     res.status(201).json({
-//       status: "success",
-//       message: "Status updated successfully.",
-//       data: {
-//         fpsId: fps.fpsId,
-//       },
-//     });
-//   }
-// );
 export const createFpsValidation = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { status } = req.body;
@@ -524,10 +319,8 @@ export const createFpsValidation = asyncHandler(
       );
     }
 
-    // Always update to trigger notifications even if status is unchanged
     await fps.update({ status, currentStep: "validation" });
 
-    // ✅ Send notification to all helpers about the final validation status sequentially
     if (fps.fpsHelper && fps.fpsHelper.length > 0) {
       for (const helper of fps.fpsHelper) {
         await sendNotification(io, {
@@ -551,15 +344,11 @@ export const createFpsValidation = asyncHandler(
   }
 );
 
-// @desc    Get FPS by fpsId
-// @route   GET /fps/:fpsId
-// @access  Private
 export const getFpsByFpsId = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id: fpsId } = req.params;
     const userId = req.user?.id;
 
-    // Find the FPS record
     const fps = await Fps.findOne({
       where: { fpsId },
       include: [
@@ -573,25 +362,13 @@ export const getFpsByFpsId = asyncHandler(
         { model: FpsDefensiveAction, as: "defensiveActions" },
       ],
     });
-
-    // If FPS record is not found, throw an error
     if (!fps) {
       return next(
         new ApiError("FPS record not found for the provided fpsId.", 404)
       );
     }
-
-    // Check if the user has access to the FPS record
-    // if (fps.userId !== userId ) {
-    //   return next(
-    //     new ApiError("You do not have access to this FPS record.", 403)
-    //   );
-    // }
-
-    // Convert Sequelize object to plain JSON to avoid circular structure errors
     const JSONFps = fps.toJSON();
 
-    // Transform the data to exclude IDs and timestamps
     const transformedFps = {
       fpsId: JSONFps.fpsId,
       status: JSONFps.status,
@@ -645,7 +422,6 @@ export const getFpsByFpsId = asyncHandler(
         ) || [],
     };
 
-    // Respond with the FPS data
     res.status(200).json({
       status: "success",
       data: transformedFps,
@@ -653,14 +429,10 @@ export const getFpsByFpsId = asyncHandler(
   }
 );
 
-// @desc    Get all FPS records for the logged-in user
-// @route   GET /fps
-// @access  Private
 export const getAllFpsForUser = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user?.id;
 
-    // Fetch all FPS records for the logged-in user
     const fpsRecords = await Fps.findAll({
       where: {
         userId,
@@ -679,7 +451,6 @@ export const getAllFpsForUser = asyncHandler(
       ],
     });
 
-    // Transform the FPS records
     const transformedFpsRecords = fpsRecords.map((fps) => ({
       fpsId: fps.fpsId,
       status: fps.status,
@@ -697,7 +468,6 @@ export const getAllFpsForUser = asyncHandler(
       },
     }));
 
-    // Respond with the FPS data
     res.status(200).json({
       status: "success",
       data: transformedFpsRecords,
@@ -710,7 +480,6 @@ export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
   const limit = req.query.limit ? Number(req.query.limit) : null;
   const offset = limit ? (page - 1) * limit : undefined;
 
-  // Get total count regardless of limit for pagination info
   const count = await Fps.count();
 
   const fpsRecords = await Fps.findAll({
@@ -765,92 +534,6 @@ export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-// export const getAllFps = asyncHandler(async (req: Request, res: Response) => {
-//   const page = Number(req.query.page) || 1;
-//   const limit = Number(req.query.limit) || 50;
-//   const offset = (page - 1) * limit;
-
-//   const fpsRecords = await Fps.findAll({
-//     include: [
-//       { model: FpsProblem, as: "problem" },
-//       {
-//         model: FpsImmediateActions,
-//         as: "immediateActions",
-//         include: [SortingResults, ImmediateActions],
-//       },
-//       { model: FpsCause, as: "cause" },
-//       { model: FpsDefensiveAction, as: "defensiveActions" },
-//       { model: User, as: "user" },
-//     ],
-//   });
-
-//   // Transform the FPS records
-//   const transformedFpsRecords = fpsRecords.map((fps) => ({
-//     fpsId: fps.fpsId,
-//     currentStep: fps.currentStep,
-//     problem: fps.problem,
-//     immediateActions: fps.immediateActions,
-//     cause: fps.cause,
-//     defensiveActions: fps.defensiveActions?.map(
-//       ({ id, fpsId, ...rest }) => rest
-//     ),
-//     user: {
-//       firstName: fps.user.firstName,
-//       lastName: fps.user.lastName,
-//       image: fps.user.image,
-//     },
-//   }));
-
-//   // Respond with the FPS data
-//   res.status(200).json({
-//     status: "success",
-//     data: transformedFpsRecords,
-//   });
-// });
-
-// @desc    Get all FPS records for the logged-in user
-// @route   GET /fps
-// @access  Private
-// export const getAllFpsHelperForUser = asyncHandler(
-//   async (req: Request, res: Response) => {
-//     const userId = req.user?.id;
-
-//     // Fetch all FPS records for the logged-in user
-//     const fpsRecords = await FpsHelper.findAll({
-//       where: { userId },
-//       include: [
-//         {
-//           model: Fps,
-//           as: "fps",
-//           include: [FpsProblem, User],
-//         },
-//       ],
-//     });
-
-//     // Transform the FPS records
-//     const transformedFpsRecords = fpsRecords.map((fpsHelper) => ({
-//       fpsId: fpsHelper.fps.fpsId,
-//       status: fpsHelper.fps.status,
-//       currentStep: fpsHelper.fps.currentStep,
-//       problem: fpsHelper.fps.problem,
-//       user: {
-//         firstName: fpsHelper.fps.user.firstName,
-//         lastName: fpsHelper.fps.user.lastName,
-//         image: fpsHelper.fps.user.image,
-//       },
-//     }));
-
-//     // Respond with the FPS data
-//     res.status(200).json({
-//       status: "success",
-//       data: transformedFpsRecords,
-//     });
-//   }
-// );
-
-// @desc    Scan FPS QR code and update scan status
-// @route   POST /fps/:id/scan
-// @access  Private
 export const scanFpsQRCode = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id: fpsId } = req.params;

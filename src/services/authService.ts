@@ -48,9 +48,6 @@ export const removeDeviceToken = asyncHandler(
 );
 
 
-// @desc    Verify activation token and matricule
-// @route   POST /auth/verify-token
-// @access  Public
 export const verifyToken = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { token, mat } = req.body;
@@ -59,15 +56,13 @@ export const verifyToken = asyncHandler(
       return next(new ApiError("Invalid request parameters", 400));
     }
 
-    // Hash the provided token
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
-    // Find user by matricule and check activation token
     const user = await User.findOne({
       where: {
         mat,
         activationToken: hashedToken,
-        activationTokenExpires: { [Op.gt]: new Date() }, // Ensure token is not expired
+        activationTokenExpires: { [Op.gt]: new Date() }, 
       },
     });
 
@@ -82,9 +77,6 @@ export const verifyToken = asyncHandler(
   }
 );
 
-// @desc    Set password and activate account
-// @route   POST /auth/set-password
-// @access  Public
 export const setPassword = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { token, mat, newPassword } = req.body;
@@ -93,10 +85,8 @@ export const setPassword = asyncHandler(
       return next(new ApiError("Invalid request parameters", 400));
     }
 
-    // Hash the provided token
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
-    // Find user by matricule and check activation token
     const user = await User.findOne({
       where: {
         mat,
@@ -108,18 +98,15 @@ export const setPassword = asyncHandler(
     if (!user) {
       return next(new ApiError("Invalid or expired token", 400));
     }
-    // password = await bcrypt.hash(instance.password, 10);
     user.password = await bcrypt.hash(newPassword, 10);
     user.passwordChangedAt = new Date();
 
-    // Activate account
     user.status = "active";
     user.activationToken = undefined;
     user.activationTokenExpires = undefined;
 
     await user.save();
 
-    // Send confirmation email
     try {
       await sendEmail(confirmationEmailTemplate(user.firstName, user.email));
     } catch (err) {
@@ -133,21 +120,10 @@ export const setPassword = asyncHandler(
   }
 );
 
-// @desc    Sign in user
-// @route   POST /auth/signin
-// @access  Public
 export const signIn = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
     const user = await User.findOne({ where: { email } });
-    console.log(email, password);
-    console.log(user);
-    console.log("/////");
-    console.log(user?.dataValues);
-    console.log("/////");
-    console.log(user?.dataValues?.password);
-    console.log("/////");
-    // console.log(await bcrypt.compare(password, user?.dataValues?.password));
     if (
       !user ||
       !user?.dataValues?.password ||
@@ -243,7 +219,6 @@ export const resetPassword = asyncHandler(
       return next(new ApiError("Reset code not verified", 400));
     }
 
-    // const hashedPassword = await bcrypt.hash(password, +process.env.BCRYPT_SALT);
     const hashedPassword = await bcrypt.hash(password, 10);
     await user.update({
       password: hashedPassword,
@@ -259,7 +234,6 @@ export const resetPassword = asyncHandler(
   }
 );
 
-// @desc    Protect routes
 export const protect = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization || null;
@@ -293,7 +267,6 @@ export const protect = asyncHandler(
   }
 );
 
-// @desc    Restrict access to specific roles
 export const allowedTo = (...roles: string[]) =>
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     if (req.user && !roles.includes(req.user.role)) {

@@ -21,7 +21,7 @@ export const socketAuthMiddleware = async (
       return next(new Error("Authentication error: User not found"));
     }
 
-    socket.data.user = user; // Attach user data to socket
+    socket.data.user = user; 
     next();
   } catch (error) {
     next(new Error("Authentication error: Invalid token"));

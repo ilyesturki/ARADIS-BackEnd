@@ -1,10 +1,4 @@
 import express from "express";
-// import {
-//   getTagValidator,
-//   createTagValidator,
-//   updateTagValidator,
-//   deleteTagValidator,
-// } from "../utils/validators/tagValidator";
 
 import {
   createTag,
@@ -13,7 +7,6 @@ import {
   getTagByTagId,
   getAllTag,
   scanTagQRCode,
-  // getAllTagHelperForUser,
 } from "../services/tagService";
 import {
   getSelectedUsersForTag,
